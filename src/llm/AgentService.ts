@@ -158,9 +158,15 @@ export class AgentService {
     console.log(`[AgentService] Config updated: ${JSON.stringify(this.modelConfig)}`);
   }
 
-  /**
-   * Clear conversation history.
-   */
+  getConversationHistory(): ModelMessage[] {
+    return [...this.conversationHistory];
+  }
+
+  setConversationHistory(messages: ModelMessage[]): void {
+    this.conversationHistory = [...messages];
+    console.log(`[AgentService] Conversation history set (${messages.length} messages).`);
+  }
+
   resetConversation(): void {
     this.conversationHistory = [];
     console.log("[AgentService] Conversation history cleared.");

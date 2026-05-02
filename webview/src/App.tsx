@@ -2,7 +2,8 @@ import { useRef, useEffect, useState } from "react";
 import { useExtensionBridge } from "./hooks/useExtensionBridge";
 import { ChatMessage } from "./components/ChatMessage";
 import { SettingsModal } from "./components/SettingsModal";
-import { Settings, Trash2 } from "lucide-react";
+import { HistoryPanel } from "./components/HistoryPanel";
+import { Settings, Trash2, History } from "lucide-react";
 import { PromptInputBox } from "./components/ui/ai-prompt-box";
 
 export default function App() {
@@ -15,21 +16,51 @@ export default function App() {
     currentApiKey,
     currentBaseUrl,
     customModels,
+    conversations,
+    currentConversationId,
+    branchPrompt,
+    clearBranchPrompt,
     sendPrompt,
     updateConfig,
     resetConversation,
+    listConversations,
+    loadConversation,
+    branchConversation,
+    deleteConversation,
+    workspaceFiles,
+    requestWorkspaceFiles,
+    openFile,
   } = useExtensionBridge();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [entries]);
 
+  useEffect(() => {
+    if (branchPrompt) {
+      setInputValue(branchPrompt);
+      clearBranchPrompt();
+    }
+  }, [branchPrompt]);
+
   const handleSend = (message: string, _files?: File[]) => {
     if (!message.trim() || isLoading) return;
     sendPrompt(message);
+    setInputValue("");
+  };
+
+  const handleOpenHistory = () => {
+    listConversations();
+    setIsHistoryOpen(true);
+  };
+
+  const handleBranch = (entryIndex: number) => {
+    branchConversation(entryIndex);
   };
 
   const isInitialScreen = entries.length === 0;
@@ -54,6 +85,17 @@ export default function App() {
           </h1>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleOpenHistory}
+            className={`p-1.5 rounded transition-colors ${
+              isInitialScreen
+                ? "text-white/80 hover:text-white hover:bg-white/20"
+                : "text-gray-500 hover:text-white hover:bg-white/5"
+            }`}
+            title="Chat History"
+          >
+            <History size={16} />
+          </button>
           <button
             onClick={resetConversation}
             className={`p-1.5 rounded transition-colors ${
@@ -90,6 +132,10 @@ export default function App() {
                 onSend={handleSend}
                 isLoading={isLoading}
                 placeholder="Ask me to build, refactor, or explain..."
+                value={inputValue}
+                onValueChange={setInputValue}
+                workspaceFiles={workspaceFiles}
+                requestWorkspaceFiles={requestWorkspaceFiles}
               />
             </div>
           </div>
@@ -98,8 +144,14 @@ export default function App() {
         <>
           <main className="flex-1 overflow-y-auto p-4 custom-scrollbar">
             <div className="flex flex-col max-w-3xl mx-auto pt-4">
-              {entries.map((entry) => (
-                <ChatMessage key={entry.id} entry={entry} />
+              {entries.map((entry, index) => (
+                <ChatMessage
+                  key={entry.id}
+                  entry={entry}
+                  entryIndex={index}
+                  onBranch={entry.role === "user" ? handleBranch : undefined}
+                  openFile={openFile}
+                />
               ))}
               {error && (
                 <div className="mb-4 p-3 text-sm text-red-400 bg-red-950/30 border border-red-900/50 rounded-xl animate-in fade-in slide-in-from-bottom-2">
@@ -116,6 +168,10 @@ export default function App() {
                 onSend={handleSend}
                 isLoading={isLoading}
                 placeholder="Reply to Opico Agent..."
+                value={inputValue}
+                onValueChange={setInputValue}
+                workspaceFiles={workspaceFiles}
+                requestWorkspaceFiles={requestWorkspaceFiles}
               />
             </div>
           </div>
@@ -131,6 +187,15 @@ export default function App() {
         currentBaseUrl={currentBaseUrl}
         customModels={customModels}
         onChangeModel={updateConfig}
+      />
+
+      <HistoryPanel
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        conversations={conversations}
+        currentConversationId={currentConversationId}
+        onLoad={loadConversation}
+        onDelete={deleteConversation}
       />
     </div>
   );

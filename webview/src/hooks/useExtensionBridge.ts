@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 export type AgentStreamEvent =
   | { type: "text-delta"; text: string }
@@ -9,18 +9,42 @@ export type AgentStreamEvent =
   | { type: "step-end" }
   | { type: "done" };
 
+export interface ConversationSummary {
+  id: string;
+  title: string;
+  createdAt: number;
+  updatedAt: number;
+  messageCount: number;
+}
+
+export interface WorkspaceFileEntry {
+  path: string;
+  type: "file" | "folder";
+}
+
 export type IncomingMessage =
   | { type: "STREAM_START" }
   | { type: "AGENT_EVENT"; payload: AgentStreamEvent }
   | { type: "STREAM_ERROR"; payload: string }
   | { type: "CONFIG_UPDATED"; payload: { provider: string; model: string; apiKey?: string; baseURL?: string } }
   | { type: "CONVERSATION_RESET" }
-  | { type: "INIT_DATA"; payload: { models: any[]; currentConfig: { provider: string; model: string; apiKey?: string; baseURL?: string } } };
+  | { type: "INIT_DATA"; payload: { models: any[]; currentConfig: { provider: string; model: string; apiKey?: string; baseURL?: string } } }
+  | { type: "CONVERSATIONS_LIST"; payload: ConversationSummary[] }
+  | { type: "CONVERSATION_LOADED"; payload: { id: string; entries: ChatEntry[] } }
+  | { type: "CONVERSATION_BRANCHED"; payload: { id: string; entries: ChatEntry[]; branchPrompt: string } }
+  | { type: "WORKSPACE_FILES"; payload: WorkspaceFileEntry[] };
 
 export type OutgoingMessage =
   | { type: "SEND_PROMPT"; payload: string }
   | { type: "UPDATE_CONFIG"; payload: { provider: string; model: string; apiKey?: string; baseURL?: string } }
-  | { type: "RESET_CONVERSATION" };
+  | { type: "RESET_CONVERSATION" }
+  | { type: "LIST_CONVERSATIONS" }
+  | { type: "LOAD_CONVERSATION"; payload: { id: string } }
+  | { type: "BRANCH_CONVERSATION"; payload: { entryIndex: number } }
+  | { type: "DELETE_CONVERSATION"; payload: { id: string } }
+  | { type: "SAVE_CONVERSATION"; payload: { entries: ChatEntry[] } }
+  | { type: "LIST_WORKSPACE_FILES"; payload: { query: string } }
+  | { type: "OPEN_FILE"; payload: { path: string } };
 
 export interface UserMessage {
   id: string;
@@ -68,6 +92,13 @@ export function useExtensionBridge() {
   const [currentApiKey, setCurrentApiKey] = useState("");
   const [currentBaseUrl, setCurrentBaseUrl] = useState("");
   const [customModels, setCustomModels] = useState<any[]>([]);
+  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [branchPrompt, setBranchPrompt] = useState<string | null>(null);
+  const [workspaceFiles, setWorkspaceFiles] = useState<WorkspaceFileEntry[]>([]);
+
+  const entriesRef = useRef<ChatEntry[]>(entries);
+  entriesRef.current = entries;
 
   useEffect(() => {
     const handler = (event: MessageEvent<IncomingMessage>) => {
@@ -100,6 +131,12 @@ export function useExtensionBridge() {
               }
               return updated;
             });
+            setTimeout(() => {
+              getVsCodeApi().postMessage({
+                type: "SAVE_CONVERSATION",
+                payload: { entries: entriesRef.current },
+              });
+            }, 100);
           } else {
             setEntries((prev) => {
               const updated = [...prev];
@@ -140,6 +177,7 @@ export function useExtensionBridge() {
         case "CONVERSATION_RESET": {
           setEntries([]);
           setError(null);
+          setCurrentConversationId(null);
           break;
         }
 
@@ -159,6 +197,33 @@ export function useExtensionBridge() {
             setCurrentApiKey(message.payload.currentConfig.apiKey || "");
             setCurrentBaseUrl(message.payload.currentConfig.baseURL || "");
           }
+          break;
+        }
+
+        case "CONVERSATIONS_LIST": {
+          setConversations(message.payload);
+          break;
+        }
+
+        case "CONVERSATION_LOADED": {
+          setEntries(message.payload.entries);
+          setCurrentConversationId(message.payload.id);
+          setError(null);
+          setIsLoading(false);
+          break;
+        }
+
+        case "CONVERSATION_BRANCHED": {
+          setEntries(message.payload.entries);
+          setCurrentConversationId(message.payload.id);
+          setBranchPrompt(message.payload.branchPrompt || null);
+          setError(null);
+          setIsLoading(false);
+          break;
+        }
+
+        case "WORKSPACE_FILES": {
+          setWorkspaceFiles(message.payload);
           break;
         }
       }
@@ -192,6 +257,30 @@ export function useExtensionBridge() {
     getVsCodeApi().postMessage({ type: "RESET_CONVERSATION" });
   }, []);
 
+  const listConversations = useCallback(() => {
+    getVsCodeApi().postMessage({ type: "LIST_CONVERSATIONS" });
+  }, []);
+
+  const loadConversation = useCallback((id: string) => {
+    getVsCodeApi().postMessage({ type: "LOAD_CONVERSATION", payload: { id } });
+  }, []);
+
+  const branchConversation = useCallback((entryIndex: number) => {
+    getVsCodeApi().postMessage({ type: "BRANCH_CONVERSATION", payload: { entryIndex } });
+  }, []);
+
+  const deleteConversation = useCallback((id: string) => {
+    getVsCodeApi().postMessage({ type: "DELETE_CONVERSATION", payload: { id } });
+  }, []);
+
+  const requestWorkspaceFiles = useCallback((query: string) => {
+    getVsCodeApi().postMessage({ type: "LIST_WORKSPACE_FILES", payload: { query } });
+  }, []);
+
+  const openFile = useCallback((filePath: string) => {
+    getVsCodeApi().postMessage({ type: "OPEN_FILE", payload: { path: filePath } });
+  }, []);
+
   return {
     entries,
     isLoading,
@@ -201,8 +290,19 @@ export function useExtensionBridge() {
     currentApiKey,
     currentBaseUrl,
     customModels,
+    conversations,
+    currentConversationId,
+    branchPrompt,
+    workspaceFiles,
+    clearBranchPrompt: () => setBranchPrompt(null),
     sendPrompt,
     updateConfig,
     resetConversation,
+    listConversations,
+    loadConversation,
+    branchConversation,
+    deleteConversation,
+    requestWorkspaceFiles,
+    openFile,
   };
 }

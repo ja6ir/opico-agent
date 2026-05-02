@@ -23,7 +23,8 @@ export function activate(context: vscode.ExtensionContext): void {
   // Register the Webview Provider for the sidebar
   const chatProvider = new ChatWebviewProvider(
     context.extensionUri,
-    workspaceRoot
+    workspaceRoot,
+    context
   );
 
   context.subscriptions.push(

@@ -1,8 +1,9 @@
 import React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { ArrowUp, Paperclip, Square, X, StopCircle, Mic, Globe, BrainCog, FolderCode } from "lucide-react";
+import { ArrowUp, Paperclip, Square, X, StopCircle, Mic, Globe, BrainCog, FolderCode, File, Folder } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import type { WorkspaceFileEntry } from "../../hooks/useExtensionBridge";
 
 // Utility function for className merging
 const cn = (...classes: (string | undefined | null | false)[]) => classes.filter(Boolean).join(" ");
@@ -344,52 +345,6 @@ const PromptInput = React.forwardRef<HTMLDivElement, PromptInputProps>(
 );
 PromptInput.displayName = "PromptInput";
 
-interface PromptInputTextareaProps {
-  disableAutosize?: boolean;
-  placeholder?: string;
-  onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
-}
-const PromptInputTextarea: React.FC<PromptInputTextareaProps & React.ComponentProps<typeof Textarea>> = ({
-  className,
-  onKeyDown,
-  disableAutosize = false,
-  placeholder,
-  ...props
-}) => {
-  const { value, setValue, maxHeight, onSubmit, disabled } = usePromptInput();
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
-
-  React.useEffect(() => {
-    if (disableAutosize || !textareaRef.current) return;
-    textareaRef.current.style.height = "auto";
-    textareaRef.current.style.height =
-      typeof maxHeight === "number"
-        ? `${Math.min(textareaRef.current.scrollHeight, maxHeight)}px`
-        : `min(${textareaRef.current.scrollHeight}px, ${maxHeight})`;
-  }, [value, maxHeight, disableAutosize]);
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      onSubmit?.();
-    }
-    onKeyDown?.(e);
-  };
-
-  return (
-    <Textarea
-      ref={textareaRef}
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      onKeyDown={handleKeyDown}
-      className={cn("text-base", className)}
-      disabled={disabled}
-      placeholder={placeholder}
-      {...props}
-    />
-  );
-};
-
 interface PromptInputActionsProps extends React.HTMLAttributes<HTMLDivElement> {}
 const PromptInputActions: React.FC<PromptInputActionsProps> = ({ children, className, ...props }) => (
   <div className={cn("flex items-center gap-2", className)} {...props}>
@@ -435,6 +390,73 @@ const CustomDivider: React.FC = () => (
   </div>
 );
 
+interface FileMentionDropdownProps {
+  files: WorkspaceFileEntry[];
+  query: string;
+  highlightedIndex: number;
+  onSelect: (file: WorkspaceFileEntry) => void;
+  onHighlight: (index: number) => void;
+  visible: boolean;
+}
+
+const FileMentionDropdown: React.FC<FileMentionDropdownProps> = ({
+  files,
+  query,
+  highlightedIndex,
+  onSelect,
+  onHighlight,
+  visible,
+}) => {
+  if (!visible || files.length === 0) return null;
+
+  const highlightMatch = (text: string) => {
+    if (!query) return text;
+    const lowerText = text.toLowerCase();
+    const lowerQuery = query.toLowerCase();
+    const idx = lowerText.indexOf(lowerQuery);
+    if (idx === -1) return text;
+    return (
+      <>
+        {text.slice(0, idx)}
+        <span className="text-[#D1D5DB] font-semibold">{text.slice(idx, idx + query.length)}</span>
+        {text.slice(idx + query.length)}
+      </>
+    );
+  };
+
+  return (
+    <div
+      className="absolute left-0 right-0 bottom-full mb-1 z-50 max-h-[240px] overflow-y-auto rounded-xl border border-[#333333] bg-[#1F2023] shadow-[0_8px_30px_rgba(0,0,0,0.4)]"
+      style={{ scrollbarWidth: "thin" }}
+    >
+      <div className="py-1">
+        {files.map((file, index) => (
+          <div
+            key={file.path}
+            className={cn(
+              "flex items-center gap-2 px-3 py-1.5 cursor-pointer text-sm transition-colors",
+              index === highlightedIndex
+                ? "bg-[#2E3033] text-white"
+                : "text-gray-400 hover:bg-[#2E3033]/50 hover:text-gray-200"
+            )}
+            onMouseEnter={() => onHighlight(index)}
+            onClick={() => onSelect(file)}
+          >
+            {file.type === "folder" ? (
+              <Folder className="h-4 w-4 text-[#DCB67A] flex-shrink-0" />
+            ) : (
+              <File className="h-4 w-4 text-[#6A9955] flex-shrink-0" />
+            )}
+            <span className="truncate font-mono text-xs">
+              {highlightMatch(file.path)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // Main PromptInputBox Component
 interface PromptInputBoxProps {
   onSend?: (message: string, files?: File[]) => void;
@@ -442,10 +464,23 @@ interface PromptInputBoxProps {
   placeholder?: string;
   className?: string;
   initialValue?: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
+  workspaceFiles?: WorkspaceFileEntry[];
+  requestWorkspaceFiles?: (query: string) => void;
 }
 export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref: React.Ref<HTMLDivElement>) => {
-  const { onSend = () => {}, isLoading = false, placeholder = "Type your message here...", className, initialValue = "" } = props;
-  const [input, setInput] = React.useState(initialValue);
+  const {
+    onSend = () => {},
+    isLoading = false,
+    placeholder = "Type your message here...",
+    className,
+    initialValue = "",
+    value,
+    workspaceFiles = [],
+    requestWorkspaceFiles = () => {},
+  } = props;
+  const [internalValue, setInternalValue] = React.useState(value ?? initialValue);
   const [files, setFiles] = React.useState<File[]>([]);
   const [filePreviews, setFilePreviews] = React.useState<{ [key: string]: string }>({});
   const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
@@ -455,6 +490,136 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
   const [showCanvas, setShowCanvas] = React.useState(false);
   const uploadInputRef = React.useRef<HTMLInputElement>(null);
   const promptBoxRef = React.useRef<HTMLDivElement>(null);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const mirrorRef = React.useRef<HTMLDivElement>(null);
+
+  const [mentionState, setMentionState] = React.useState<{
+    active: boolean;
+    query: string;
+    startIndex: number;
+  } | null>(null);
+  const [highlightedIndex, setHighlightedIndex] = React.useState(0);
+
+  const debouncedFileRequestRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const detectMention = React.useCallback((text: string, cursorPos: number) => {
+    const textBeforeCursor = text.slice(0, cursorPos);
+    const atMatch = textBeforeCursor.match(/@([^@\s]*)$/);
+    if (atMatch) {
+      const query = atMatch[1];
+      const startIndex = cursorPos - query.length - 1;
+      const charBefore = startIndex > 0 ? text[startIndex - 1] : " ";
+      if (charBefore !== " " && charBefore !== "\n" && startIndex > 0) {
+        setMentionState(null);
+        return;
+      }
+      setMentionState({ active: true, query, startIndex });
+      setHighlightedIndex(0);
+      if (debouncedFileRequestRef.current) clearTimeout(debouncedFileRequestRef.current);
+      debouncedFileRequestRef.current = setTimeout(() => {
+        requestWorkspaceFiles(query);
+      }, 100);
+    } else {
+      if (mentionState?.active) {
+        setMentionState(null);
+        setHighlightedIndex(0);
+      }
+    }
+  }, [mentionState, requestWorkspaceFiles]);
+
+  const handleChange = React.useCallback((newValue: string) => {
+    setInternalValue(newValue);
+    props.onValueChange?.(newValue);
+    const cursorPos = textareaRef.current?.selectionStart ?? newValue.length;
+    detectMention(newValue, cursorPos);
+  }, [props.onValueChange, detectMention]);
+
+  const insertMention = React.useCallback((file: WorkspaceFileEntry) => {
+    if (!mentionState) return;
+    const text = internalValue;
+    const before = text.slice(0, mentionState.startIndex);
+    const after = text.slice(mentionState.startIndex + 1 + mentionState.query.length);
+    const insertPath = file.type === "folder" ? `${file.path}/` : file.path;
+    const newValue = `${before}@${insertPath} ${after}`;
+    setInternalValue(newValue);
+    props.onValueChange?.(newValue);
+    setMentionState(null);
+    setHighlightedIndex(0);
+    requestAnimationFrame(() => {
+      if (textareaRef.current) {
+        const newCursorPos = mentionState.startIndex + 1 + insertPath.length + 1;
+        textareaRef.current.focus();
+        textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
+      }
+    });
+  }, [internalValue, mentionState, props.onValueChange]);
+
+  const handleTextareaKeyDown = React.useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (!mentionState?.active || workspaceFiles.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => (prev + 1) % Math.min(workspaceFiles.length, 100));
+      return true;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => (prev - 1 + Math.min(workspaceFiles.length, 100)) % Math.min(workspaceFiles.length, 100));
+      return true;
+    }
+    if (e.key === "Enter" || e.key === "Tab") {
+      e.preventDefault();
+      const visibleFiles = workspaceFiles.slice(0, 100);
+      if (visibleFiles[highlightedIndex]) {
+        insertMention(visibleFiles[highlightedIndex]);
+      }
+      return true;
+    }
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setMentionState(null);
+      setHighlightedIndex(0);
+      return true;
+    }
+    return false;
+  }, [mentionState, workspaceFiles, highlightedIndex, insertMention]);
+
+  const syncMirrorScroll = React.useCallback(() => {
+    if (mirrorRef.current && textareaRef.current) {
+      mirrorRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
+  }, []);
+
+  const renderHighlightedText = (text: string) => {
+    if (!text) return null;
+    const parts: React.ReactNode[] = [];
+    const regex = /@([a-zA-Z0-9._\-/\\]+)/g;
+    let lastIndex = 0;
+    let match;
+    let key = 0;
+
+    while ((match = regex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(<span key={key++}>{text.slice(lastIndex, match.index)}</span>);
+      }
+      parts.push(
+        <span key={key++} style={{ color: "#CE9178" }}>
+          {match[0]}
+        </span>
+      );
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < text.length) {
+      parts.push(<span key={key++}>{text.slice(lastIndex)}</span>);
+    }
+
+    if (parts.length === 0 && text) {
+      parts.push(<span key={0}>{text}</span>);
+    }
+
+    return parts;
+  };
 
   const handleToggleChange = (value: string) => {
     if (value === "search") {
@@ -532,16 +697,17 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
   }, [handlePaste]);
 
   const handleSubmit = () => {
-    if (input.trim() || files.length > 0) {
+    if (internalValue.trim() || files.length > 0) {
       let messagePrefix = "";
       if (showSearch) messagePrefix = "[Search: ";
       else if (showThink) messagePrefix = "[Think: ";
       else if (showCanvas) messagePrefix = "[Canvas: ";
-      const formattedInput = messagePrefix ? `${messagePrefix}${input}]` : input;
+      const formattedInput = messagePrefix ? `${messagePrefix}${internalValue}]` : internalValue;
       onSend(formattedInput, files);
-      setInput("");
+      setInternalValue("");
       setFiles([]);
       setFilePreviews({});
+      setMentionState(null);
     }
   };
 
@@ -553,262 +719,344 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
     onSend(`[Voice message - ${duration} seconds]`, []);
   };
 
-  const hasContent = input.trim() !== "" || files.length > 0;
+  const hasContent = internalValue.trim() !== "" || files.length > 0;
+
+  React.useEffect(() => {
+    if (value !== undefined) {
+      setInternalValue(value);
+    }
+  }, [value]);
+
+  React.useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (mentionState?.active && promptBoxRef.current && !promptBoxRef.current.contains(e.target as Node)) {
+        setMentionState(null);
+        setHighlightedIndex(0);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [mentionState]);
+
+  const currentPlaceholder = showSearch
+    ? "Search the web..."
+    : showThink
+    ? "Think deeply..."
+    : showCanvas
+    ? "Create on canvas..."
+    : placeholder;
+
+  const maxTextareaHeight = 240;
+
+  const autoResizeTextarea = React.useCallback(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    ta.style.height = "auto";
+    ta.style.height = `${Math.min(ta.scrollHeight, maxTextareaHeight)}px`;
+  }, []);
+
+  React.useEffect(() => {
+    autoResizeTextarea();
+  }, [internalValue, autoResizeTextarea]);
+
+  const onTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const handled = handleTextareaKeyDown(e);
+    if (handled) return;
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (!mentionState?.active) {
+        handleSubmit();
+      }
+    }
+  };
 
   return (
     <>
-      <PromptInput
-        value={input}
-        onValueChange={setInput}
-        isLoading={isLoading}
-        onSubmit={handleSubmit}
-        className={cn(
-          "w-full bg-[#1F2023] border-[#444444] shadow-[0_8px_30px_rgba(0,0,0,0.24)] transition-all duration-300 ease-in-out",
-          isRecording && "border-red-500/70",
-          className
+      <div className="relative" ref={promptBoxRef}>
+        {mentionState?.active && workspaceFiles.length > 0 && (
+          <FileMentionDropdown
+            files={workspaceFiles.slice(0, 100)}
+            query={mentionState.query}
+            highlightedIndex={highlightedIndex}
+            onSelect={insertMention}
+            onHighlight={setHighlightedIndex}
+            visible={true}
+          />
         )}
-        disabled={isLoading || isRecording}
-        ref={ref || promptBoxRef}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-      >
-        {files.length > 0 && !isRecording && (
-          <div className="flex flex-wrap gap-2 p-0 pb-1 transition-all duration-300">
-            {files.map((file, index) => (
-              <div key={index} className="relative group">
-                {file.type.startsWith("image/") && filePreviews[file.name] && (
-                  <div
-                    className="w-16 h-16 rounded-xl overflow-hidden cursor-pointer transition-all duration-300"
-                    onClick={() => openImageModal(filePreviews[file.name])}
-                  >
-                    <img
-                      src={filePreviews[file.name]}
-                      alt={file.name}
-                      className="h-full w-full object-cover"
-                    />
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveFile(index);
-                      }}
-                      className="absolute top-1 right-1 rounded-full bg-black/70 p-0.5 opacity-100 transition-opacity"
-                    >
-                      <X className="h-3 w-3 text-white" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div
+        <PromptInput
+          value={internalValue}
+          onValueChange={handleChange}
+          isLoading={isLoading}
+          onSubmit={handleSubmit}
           className={cn(
-            "transition-all duration-300",
-            isRecording ? "h-0 overflow-hidden opacity-0" : "opacity-100"
+            "w-full bg-[#1F2023] border-[#444444] shadow-[0_8px_30px_rgba(0,0,0,0.24)] transition-all duration-300 ease-in-out",
+            isRecording && "border-red-500/70",
+            className
           )}
+          disabled={isLoading || isRecording}
+          ref={ref}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
         >
-          <PromptInputTextarea
-            placeholder={
-              showSearch
-                ? "Search the web..."
-                : showThink
-                ? "Think deeply..."
-                : showCanvas
-                ? "Create on canvas..."
-                : placeholder
-            }
-            className="text-base"
-          />
-        </div>
+          {files.length > 0 && !isRecording && (
+            <div className="flex flex-wrap gap-2 p-0 pb-1 transition-all duration-300">
+              {files.map((file, index) => (
+                <div key={index} className="relative group">
+                  {file.type.startsWith("image/") && filePreviews[file.name] && (
+                    <div
+                      className="w-16 h-16 rounded-xl overflow-hidden cursor-pointer transition-all duration-300"
+                      onClick={() => openImageModal(filePreviews[file.name])}
+                    >
+                      <img
+                        src={filePreviews[file.name]}
+                        alt={file.name}
+                        className="h-full w-full object-cover"
+                      />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveFile(index);
+                        }}
+                        className="absolute top-1 right-1 rounded-full bg-black/70 p-0.5 opacity-100 transition-opacity"
+                      >
+                        <X className="h-3 w-3 text-white" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
 
-        {isRecording && (
-          <VoiceRecorder
-            isRecording={isRecording}
-            onStartRecording={handleStartRecording}
-            onStopRecording={handleStopRecording}
-          />
-        )}
-
-        <PromptInputActions className="flex items-center justify-between gap-2 p-0 pt-2">
           <div
             className={cn(
-              "flex items-center gap-1 transition-opacity duration-300",
-              isRecording ? "opacity-0 invisible h-0" : "opacity-100 visible"
+              "transition-all duration-300",
+              isRecording ? "h-0 overflow-hidden opacity-0" : "opacity-100"
             )}
           >
-            <PromptInputAction tooltip="Upload image">
-              <button
-                onClick={() => uploadInputRef.current?.click()}
-                className="flex h-8 w-8 text-[#9CA3AF] cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-gray-600/30 hover:text-[#D1D5DB]"
-                disabled={isRecording}
+            <div className="relative">
+              <div
+                ref={mirrorRef}
+                className="absolute inset-0 pointer-events-none overflow-hidden px-3 py-2.5 text-base font-sans whitespace-pre-wrap break-words"
+                style={{
+                  color: "#F3F4F6",
+                  maxHeight: `${maxTextareaHeight}px`,
+                }}
               >
-                <Paperclip className="h-5 w-5 transition-colors" />
-                <input
-                  ref={uploadInputRef}
-                  type="file"
-                  className="hidden"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files.length > 0) processFile(e.target.files[0]);
-                    if (e.target) e.target.value = "";
-                  }}
-                  accept="image/*"
-                />
-              </button>
-            </PromptInputAction>
-
-            <div className="flex items-center">
-              <button
-                type="button"
-                onClick={() => handleToggleChange("search")}
-                className={cn(
-                  "rounded-full transition-all flex items-center gap-1 px-2 py-1 border h-8",
-                  showSearch
-                    ? "bg-[#1EAEDB]/15 border-[#1EAEDB] text-[#1EAEDB]"
-                    : "bg-transparent border-transparent text-[#9CA3AF] hover:text-[#D1D5DB]"
+                {renderHighlightedText(internalValue) || (
+                  <span className="text-gray-400">{currentPlaceholder}</span>
                 )}
-              >
-                <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
-                  <motion.div
-                    animate={{ rotate: showSearch ? 360 : 0, scale: showSearch ? 1.1 : 1 }}
-                    whileHover={{ rotate: showSearch ? 360 : 15, scale: 1.1, transition: { type: "spring", stiffness: 300, damping: 10 } }}
-                    transition={{ type: "spring", stiffness: 260, damping: 25 }}
-                  >
-                    <Globe className={cn("w-4 h-4", showSearch ? "text-[#1EAEDB]" : "text-inherit")} />
-                  </motion.div>
-                </div>
-                <AnimatePresence>
-                  {showSearch && (
-                    <motion.span
-                      initial={{ width: 0, opacity: 0 }}
-                      animate={{ width: "auto", opacity: 1 }}
-                      exit={{ width: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="text-xs overflow-hidden whitespace-nowrap text-[#1EAEDB] flex-shrink-0"
-                    >
-                      Search
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </button>
-
-              <CustomDivider />
-
-              <button
-                type="button"
-                onClick={() => handleToggleChange("think")}
+              </div>
+              <textarea
+                ref={textareaRef}
+                value={internalValue}
+                onChange={(e) => handleChange(e.target.value)}
+                onKeyDown={onTextareaKeyDown}
+                onScroll={syncMirrorScroll}
                 className={cn(
-                  "rounded-full transition-all flex items-center gap-1 px-2 py-1 border h-8",
-                  showThink
-                    ? "bg-[#8B5CF6]/15 border-[#8B5CF6] text-[#8B5CF6]"
-                    : "bg-transparent border-transparent text-[#9CA3AF] hover:text-[#D1D5DB]"
+                  "flex w-full rounded-md border-none bg-transparent px-3 py-2.5 text-base font-sans focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50 min-h-[44px] resize-none",
+                  "scrollbar-thin scrollbar-thumb-[#444444] scrollbar-track-transparent hover:scrollbar-thumb-[#555555]"
                 )}
-              >
-                <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
-                  <motion.div
-                    animate={{ rotate: showThink ? 360 : 0, scale: showThink ? 1.1 : 1 }}
-                    whileHover={{ rotate: showThink ? 360 : 15, scale: 1.1, transition: { type: "spring", stiffness: 300, damping: 10 } }}
-                    transition={{ type: "spring", stiffness: 260, damping: 25 }}
-                  >
-                    <BrainCog className={cn("w-4 h-4", showThink ? "text-[#8B5CF6]" : "text-inherit")} />
-                  </motion.div>
-                </div>
-                <AnimatePresence>
-                  {showThink && (
-                    <motion.span
-                      initial={{ width: 0, opacity: 0 }}
-                      animate={{ width: "auto", opacity: 1 }}
-                      exit={{ width: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="text-xs overflow-hidden whitespace-nowrap text-[#8B5CF6] flex-shrink-0"
-                    >
-                      Think
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </button>
-
-              <CustomDivider />
-
-              <button
-                type="button"
-                onClick={handleCanvasToggle}
-                className={cn(
-                  "rounded-full transition-all flex items-center gap-1 px-2 py-1 border h-8",
-                  showCanvas
-                    ? "bg-[#F97316]/15 border-[#F97316] text-[#F97316]"
-                    : "bg-transparent border-transparent text-[#9CA3AF] hover:text-[#D1D5DB]"
-                )}
-              >
-                <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
-                  <motion.div
-                    animate={{ rotate: showCanvas ? 360 : 0, scale: showCanvas ? 1.1 : 1 }}
-                    whileHover={{ rotate: showCanvas ? 360 : 15, scale: 1.1, transition: { type: "spring", stiffness: 300, damping: 10 } }}
-                    transition={{ type: "spring", stiffness: 260, damping: 25 }}
-                  >
-                    <FolderCode className={cn("w-4 h-4", showCanvas ? "text-[#F97316]" : "text-inherit")} />
-                  </motion.div>
-                </div>
-                <AnimatePresence>
-                  {showCanvas && (
-                    <motion.span
-                      initial={{ width: 0, opacity: 0 }}
-                      animate={{ width: "auto", opacity: 1 }}
-                      exit={{ width: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="text-xs overflow-hidden whitespace-nowrap text-[#F97316] flex-shrink-0"
-                    >
-                      Canvas
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </button>
+                style={{
+                  color: "transparent",
+                  caretColor: "#F3F4F6",
+                  maxHeight: `${maxTextareaHeight}px`,
+                }}
+                disabled={isLoading || isRecording}
+                placeholder={currentPlaceholder}
+                rows={1}
+              />
             </div>
           </div>
 
-          <PromptInputAction
-            tooltip={
-              isLoading
-                ? "Stop generation"
-                : isRecording
-                ? "Stop recording"
-                : hasContent
-                ? "Send message"
-                : "Voice message"
-            }
-          >
-            <Button
-              variant="default"
-              size="icon"
+          {isRecording && (
+            <VoiceRecorder
+              isRecording={isRecording}
+              onStartRecording={handleStartRecording}
+              onStopRecording={handleStopRecording}
+            />
+          )}
+
+          <PromptInputActions className="flex items-center justify-between gap-2 p-0 pt-2">
+            <div
               className={cn(
-                "h-8 w-8 rounded-full transition-all duration-200",
-                isRecording
-                  ? "bg-transparent hover:bg-gray-600/30 text-red-500 hover:text-red-400"
-                  : hasContent
-                  ? "bg-white hover:bg-white/80 text-[#1F2023]"
-                  : "bg-transparent hover:bg-gray-600/30 text-[#9CA3AF] hover:text-[#D1D5DB]"
+                "flex items-center gap-1 transition-opacity duration-300",
+                isRecording ? "opacity-0 invisible h-0" : "opacity-100 visible"
               )}
-              onClick={() => {
-                if (isRecording) setIsRecording(false);
-                else if (hasContent) handleSubmit();
-                else setIsRecording(true);
-              }}
-              disabled={isLoading && !hasContent}
             >
-              {isLoading ? (
-                <Square className="h-4 w-4 fill-[#1F2023] animate-pulse" />
-              ) : isRecording ? (
-                <StopCircle className="h-5 w-5 text-red-500" />
-              ) : hasContent ? (
-                <ArrowUp className="h-4 w-4 text-[#1F2023]" />
-              ) : (
-                <Mic className="h-5 w-5 text-[#1F2023] transition-colors" />
-              )}
-            </Button>
-          </PromptInputAction>
-        </PromptInputActions>
-      </PromptInput>
+              <PromptInputAction tooltip="Upload image">
+                <button
+                  onClick={() => uploadInputRef.current?.click()}
+                  className="flex h-8 w-8 text-[#9CA3AF] cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-gray-600/30 hover:text-[#D1D5DB]"
+                  disabled={isRecording}
+                >
+                  <Paperclip className="h-5 w-5 transition-colors" />
+                  <input
+                    ref={uploadInputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files.length > 0) processFile(e.target.files[0]);
+                      if (e.target) e.target.value = "";
+                    }}
+                    accept="image/*"
+                  />
+                </button>
+              </PromptInputAction>
+
+              <div className="flex items-center">
+                <button
+                  type="button"
+                  onClick={() => handleToggleChange("search")}
+                  className={cn(
+                    "rounded-full transition-all flex items-center gap-1 px-2 py-1 border h-8",
+                    showSearch
+                      ? "bg-[#1EAEDB]/15 border-[#1EAEDB] text-[#1EAEDB]"
+                      : "bg-transparent border-transparent text-[#9CA3AF] hover:text-[#D1D5DB]"
+                  )}
+                >
+                  <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                    <motion.div
+                      animate={{ rotate: showSearch ? 360 : 0, scale: showSearch ? 1.1 : 1 }}
+                      whileHover={{ rotate: showSearch ? 360 : 15, scale: 1.1, transition: { type: "spring", stiffness: 300, damping: 10 } }}
+                      transition={{ type: "spring", stiffness: 260, damping: 25 }}
+                    >
+                      <Globe className={cn("w-4 h-4", showSearch ? "text-[#1EAEDB]" : "text-inherit")} />
+                    </motion.div>
+                  </div>
+                  <AnimatePresence>
+                    {showSearch && (
+                      <motion.span
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={{ width: "auto", opacity: 1 }}
+                        exit={{ width: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="text-xs overflow-hidden whitespace-nowrap text-[#1EAEDB] flex-shrink-0"
+                      >
+                        Search
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </button>
+
+                <CustomDivider />
+
+                <button
+                  type="button"
+                  onClick={() => handleToggleChange("think")}
+                  className={cn(
+                    "rounded-full transition-all flex items-center gap-1 px-2 py-1 border h-8",
+                    showThink
+                      ? "bg-[#8B5CF6]/15 border-[#8B5CF6] text-[#8B5CF6]"
+                      : "bg-transparent border-transparent text-[#9CA3AF] hover:text-[#D1D5DB]"
+                  )}
+                >
+                  <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                    <motion.div
+                      animate={{ rotate: showThink ? 360 : 0, scale: showThink ? 1.1 : 1 }}
+                      whileHover={{ rotate: showThink ? 360 : 15, scale: 1.1, transition: { type: "spring", stiffness: 300, damping: 10 } }}
+                      transition={{ type: "spring", stiffness: 260, damping: 25 }}
+                    >
+                      <BrainCog className={cn("w-4 h-4", showThink ? "text-[#8B5CF6]" : "text-inherit")} />
+                    </motion.div>
+                  </div>
+                  <AnimatePresence>
+                    {showThink && (
+                      <motion.span
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={{ width: "auto", opacity: 1 }}
+                        exit={{ width: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="text-xs overflow-hidden whitespace-nowrap text-[#8B5CF6] flex-shrink-0"
+                      >
+                        Think
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </button>
+
+                <CustomDivider />
+
+                <button
+                  type="button"
+                  onClick={handleCanvasToggle}
+                  className={cn(
+                    "rounded-full transition-all flex items-center gap-1 px-2 py-1 border h-8",
+                    showCanvas
+                      ? "bg-[#F97316]/15 border-[#F97316] text-[#F97316]"
+                      : "bg-transparent border-transparent text-[#9CA3AF] hover:text-[#D1D5DB]"
+                  )}
+                >
+                  <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                    <motion.div
+                      animate={{ rotate: showCanvas ? 360 : 0, scale: showCanvas ? 1.1 : 1 }}
+                      whileHover={{ rotate: showCanvas ? 360 : 15, scale: 1.1, transition: { type: "spring", stiffness: 300, damping: 10 } }}
+                      transition={{ type: "spring", stiffness: 260, damping: 25 }}
+                    >
+                      <FolderCode className={cn("w-4 h-4", showCanvas ? "text-[#F97316]" : "text-inherit")} />
+                    </motion.div>
+                  </div>
+                  <AnimatePresence>
+                    {showCanvas && (
+                      <motion.span
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={{ width: "auto", opacity: 1 }}
+                        exit={{ width: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="text-xs overflow-hidden whitespace-nowrap text-[#F97316] flex-shrink-0"
+                      >
+                        Canvas
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </button>
+              </div>
+            </div>
+
+            <PromptInputAction
+              tooltip={
+                isLoading
+                  ? "Stop generation"
+                  : isRecording
+                  ? "Stop recording"
+                  : hasContent
+                  ? "Send message"
+                  : "Voice message"
+              }
+            >
+              <Button
+                variant="default"
+                size="icon"
+                className={cn(
+                  "h-8 w-8 rounded-full transition-all duration-200",
+                  isRecording
+                    ? "bg-transparent hover:bg-gray-600/30 text-red-500 hover:text-red-400"
+                    : hasContent
+                    ? "bg-white hover:bg-white/80 text-[#1F2023]"
+                    : "bg-transparent hover:bg-gray-600/30 text-[#9CA3AF] hover:text-[#D1D5DB]"
+                )}
+                onClick={() => {
+                  if (isRecording) setIsRecording(false);
+                  else if (hasContent) handleSubmit();
+                  else setIsRecording(true);
+                }}
+                disabled={isLoading && !hasContent}
+              >
+                {isLoading ? (
+                  <Square className="h-4 w-4 fill-[#1F2023] animate-pulse" />
+                ) : isRecording ? (
+                  <StopCircle className="h-5 w-5 text-red-500" />
+                ) : hasContent ? (
+                  <ArrowUp className="h-4 w-4 text-[#1F2023]" />
+                ) : (
+                  <Mic className="h-5 w-5 text-[#1F2023] transition-colors" />
+                )}
+              </Button>
+            </PromptInputAction>
+          </PromptInputActions>
+        </PromptInput>
+      </div>
 
       <ImageViewDialog imageUrl={selectedImage} onClose={() => setSelectedImage(null)} />
     </>
