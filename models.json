@@ -1,0 +1,1532 @@
+[
+  {
+    "provider": "xAI",
+    "model_name": "grok-4.3",
+    "display_name": "xAI: Grok 4.3",
+    "base_url": "https://api.x.ai/v1"
+  },
+  {
+    "provider": "IBM",
+    "model_name": "granite-4.1-8b",
+    "display_name": "IBM: Granite 4.1 8B",
+    "base_url": "https://us-south.ml.cloud.ibm.com/ml/v1"
+  },
+  {
+    "provider": "OpenRouter",
+    "model_name": "owl-alpha",
+    "display_name": "Owl Alpha",
+    "base_url": "https://openrouter.ai/api/v1"
+  },
+  {
+    "provider": "NVIDIA",
+    "model_name": "nemotron-3-nano-omni-30b-a3b-reasoning:free",
+    "display_name": "NVIDIA: Nemotron 3 Nano Omni (free)",
+    "base_url": "https://integrate.api.nvidia.com/v1"
+  },
+  {
+    "provider": "Poolside",
+    "model_name": "laguna-xs.2:free",
+    "display_name": "Poolside: Laguna XS.2 (free)",
+    "base_url": "https://api.poolside.ai/v1"
+  },
+  {
+    "provider": "Poolside",
+    "model_name": "laguna-m.1:free",
+    "display_name": "Poolside: Laguna M.1 (free)",
+    "base_url": "https://api.poolside.ai/v1"
+  },
+  {
+    "provider": "MoonshotAI",
+    "model_name": "kimi-latest",
+    "display_name": "MoonshotAI Kimi Latest",
+    "base_url": "https://api.moonshot.cn/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3.5-plus-20260420",
+    "display_name": "Qwen: Qwen3.5 Plus 2026-04-20",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3.6-flash",
+    "display_name": "Qwen: Qwen3.6 Flash",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3.6-35b-a3b",
+    "display_name": "Qwen: Qwen3.6 35B A3B",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3.6-max-preview",
+    "display_name": "Qwen: Qwen3.6 Max Preview",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3.6-27b",
+    "display_name": "Qwen: Qwen3.6 27B",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "DeepSeek",
+    "model_name": "deepseek-v4-pro",
+    "display_name": "DeepSeek: DeepSeek V4 Pro",
+    "base_url": "https://api.deepseek.com/v1"
+  },
+  {
+    "provider": "DeepSeek",
+    "model_name": "deepseek-v4-flash",
+    "display_name": "DeepSeek: DeepSeek V4 Flash",
+    "base_url": "https://api.deepseek.com/v1"
+  },
+  {
+    "provider": "InclusionAI",
+    "model_name": "ling-2.6-1t:free",
+    "display_name": "inclusionAI: Ling-2.6-1T (free)",
+    "base_url": "https://api.inclusion.ai/v1"
+  },
+  {
+    "provider": "Tencent",
+    "model_name": "hy3-preview:free",
+    "display_name": "Tencent: Hy3 preview (free)",
+    "base_url": "https://hunyuan.tencentcloudapi.com"
+  },
+  {
+    "provider": "Xiaomi",
+    "model_name": "mimo-v2.5-pro",
+    "display_name": "Xiaomi: MiMo-V2.5-Pro",
+    "base_url": "https://api.xiaoai.mi.com/v1"
+  },
+  {
+    "provider": "Xiaomi",
+    "model_name": "mimo-v2.5",
+    "display_name": "Xiaomi: MiMo-V2.5",
+    "base_url": "https://api.xiaoai.mi.com/v1"
+  },
+  {
+    "provider": "InclusionAI",
+    "model_name": "ling-2.6-flash",
+    "display_name": "inclusionAI: Ling-2.6-flash",
+    "base_url": "https://api.inclusion.ai/v1"
+  },
+  {
+    "provider": "OpenRouter",
+    "model_name": "pareto-code",
+    "display_name": "Pareto Code Router",
+    "base_url": "https://openrouter.ai/api/v1"
+  },
+  {
+    "provider": "Baidu",
+    "model_name": "qianfan-ocr-fast:free",
+    "display_name": "Baidu: Qianfan-OCR-Fast (free)",
+    "base_url": "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop"
+  },
+  {
+    "provider": "MoonshotAI",
+    "model_name": "kimi-k2.6",
+    "display_name": "MoonshotAI: Kimi K2.6",
+    "base_url": "https://api.moonshot.cn/v1"
+  },
+  {
+    "provider": "Z.ai",
+    "model_name": "glm-5.1",
+    "display_name": "Z.ai: GLM 5.1",
+    "base_url": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3.6-plus",
+    "display_name": "Qwen: Qwen3.6 Plus",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Z.ai",
+    "model_name": "glm-5v-turbo",
+    "display_name": "Z.ai: GLM 5V Turbo",
+    "base_url": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+    "provider": "Arcee AI",
+    "model_name": "trinity-large-thinking",
+    "display_name": "Arcee AI: Trinity Large Thinking",
+    "base_url": "https://api.arcee.ai/v1"
+  },
+  {
+    "provider": "xAI",
+    "model_name": "grok-4.20-multi-agent",
+    "display_name": "xAI: Grok 4.20 Multi-Agent",
+    "base_url": "https://api.x.ai/v1"
+  },
+  {
+    "provider": "xAI",
+    "model_name": "grok-4.20",
+    "display_name": "xAI: Grok 4.20",
+    "base_url": "https://api.x.ai/v1"
+  },
+  {
+    "provider": "Kwaipilot",
+    "model_name": "kat-coder-pro-v2",
+    "display_name": "Kwaipilot: KAT-Coder-Pro V2",
+    "base_url": "https://api.kuaishou.com/v1"
+  },
+  {
+    "provider": "Reka AI",
+    "model_name": "reka-edge",
+    "display_name": "Reka Edge",
+    "base_url": "https://api.reka.ai/v1"
+  },
+  {
+    "provider": "Xiaomi",
+    "model_name": "mimo-v2-omni",
+    "display_name": "Xiaomi: MiMo-V2-Omni",
+    "base_url": "https://api.xiaoai.mi.com/v1"
+  },
+  {
+    "provider": "Xiaomi",
+    "model_name": "mimo-v2-pro",
+    "display_name": "Xiaomi: MiMo-V2-Pro",
+    "base_url": "https://api.xiaoai.mi.com/v1"
+  },
+  {
+    "provider": "MiniMax",
+    "model_name": "minimax-m2.7",
+    "display_name": "MiniMax: MiniMax M2.7",
+    "base_url": "https://api.minimax.chat/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "mistral-small-2603",
+    "display_name": "Mistral: Mistral Small 4",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Z.ai",
+    "model_name": "glm-5-turbo",
+    "display_name": "Z.ai: GLM 5 Turbo",
+    "base_url": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+    "provider": "NVIDIA",
+    "model_name": "nemotron-3-super-120b-a12b:free",
+    "display_name": "NVIDIA: Nemotron 3 Super (free)",
+    "base_url": "https://integrate.api.nvidia.com/v1"
+  },
+  {
+    "provider": "NVIDIA",
+    "model_name": "nemotron-3-super-120b-a12b",
+    "display_name": "NVIDIA: Nemotron 3 Super",
+    "base_url": "https://integrate.api.nvidia.com/v1"
+  },
+  {
+    "provider": "ByteDance",
+    "model_name": "seed-2.0-lite",
+    "display_name": "ByteDance Seed: Seed-2.0-Lite",
+    "base_url": "https://ark.cn-volces.com/api/v3"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3.5-9b",
+    "display_name": "Qwen: Qwen3.5-9B",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Inception",
+    "model_name": "mercury-2",
+    "display_name": "Inception: Mercury 2",
+    "base_url": "https://api.inceptionai.com/v1"
+  },
+  {
+    "provider": "ByteDance",
+    "model_name": "seed-2.0-mini",
+    "display_name": "ByteDance Seed: Seed-2.0-Mini",
+    "base_url": "https://ark.cn-volces.com/api/v3"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3.5-35b-a3b",
+    "display_name": "Qwen: Qwen3.5-35B-A3B",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3.5-27b",
+    "display_name": "Qwen: Qwen3.5-27B",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3.5-122b-a10b",
+    "display_name": "Qwen: Qwen3.5-122B-A10B",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3.5-flash-02-23",
+    "display_name": "Qwen: Qwen3.5-Flash",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "LiquidAI",
+    "model_name": "lfm-2-24b-a2b",
+    "display_name": "LiquidAI: LFM2-24B-A2B",
+    "base_url": "https://api.liquid.ai/v1"
+  },
+  {
+    "provider": "AionLabs",
+    "model_name": "aion-2.0",
+    "display_name": "AionLabs: Aion-2.0",
+    "base_url": "https://api.aionlabs.com/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3.5-plus-02-15",
+    "display_name": "Qwen: Qwen3.5 Plus 2026-02-15",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3.5-397b-a17b",
+    "display_name": "Qwen: Qwen3.5 397B A17B",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "MiniMax",
+    "model_name": "minimax-m2.5:free",
+    "display_name": "MiniMax: MiniMax M2.5 (free)",
+    "base_url": "https://api.minimax.chat/v1"
+  },
+  {
+    "provider": "MiniMax",
+    "model_name": "minimax-m2.5",
+    "display_name": "MiniMax: MiniMax M2.5",
+    "base_url": "https://api.minimax.chat/v1"
+  },
+  {
+    "provider": "Z.ai",
+    "model_name": "glm-5",
+    "display_name": "Z.ai: GLM 5",
+    "base_url": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-max-thinking",
+    "display_name": "Qwen: Qwen3 Max Thinking",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-coder-next",
+    "display_name": "Qwen: Qwen3 Coder Next",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "OpenRouter",
+    "model_name": "free",
+    "display_name": "Free Models Router",
+    "base_url": "https://openrouter.ai/api/v1"
+  },
+  {
+    "provider": "StepFun",
+    "model_name": "step-3.5-flash",
+    "display_name": "StepFun: Step 3.5 Flash",
+    "base_url": "https://api.stepfun.com/v1"
+  },
+  {
+    "provider": "Arcee AI",
+    "model_name": "trinity-large-preview",
+    "display_name": "Arcee AI: Trinity Large Preview",
+    "base_url": "https://api.arcee.ai/v1"
+  },
+  {
+    "provider": "MoonshotAI",
+    "model_name": "kimi-k2.5",
+    "display_name": "MoonshotAI: Kimi K2.5",
+    "base_url": "https://api.moonshot.cn/v1"
+  },
+  {
+    "provider": "Upstage",
+    "model_name": "solar-pro-3",
+    "display_name": "Upstage: Solar Pro 3",
+    "base_url": "https://api.upstage.ai/v1/solar"
+  },
+  {
+    "provider": "MiniMax",
+    "model_name": "minimax-m2-her",
+    "display_name": "MiniMax: MiniMax M2-her",
+    "base_url": "https://api.minimax.chat/v1"
+  },
+  {
+    "provider": "Writer",
+    "model_name": "palmyra-x5",
+    "display_name": "Writer: Palmyra X5",
+    "base_url": "https://api.writer.com/v1"
+  },
+  {
+    "provider": "LiquidAI",
+    "model_name": "lfm-2.5-1.2b-thinking:free",
+    "display_name": "LiquidAI: LFM2.5-1.2B-Thinking (free)",
+    "base_url": "https://api.liquid.ai/v1"
+  },
+  {
+    "provider": "LiquidAI",
+    "model_name": "lfm-2.5-1.2b-instruct:free",
+    "display_name": "LiquidAI: LFM2.5-1.2B-Instruct (free)",
+    "base_url": "https://api.liquid.ai/v1"
+  },
+  {
+    "provider": "Z.ai",
+    "model_name": "glm-4.7-flash",
+    "display_name": "Z.ai: GLM 4.7 Flash",
+    "base_url": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+    "provider": "AllenAI",
+    "model_name": "olmo-3.1-32b-instruct",
+    "display_name": "AllenAI: Olmo 3.1 32B Instruct",
+    "base_url": "https://api.allenai.org/v1"
+  },
+  {
+    "provider": "ByteDance",
+    "model_name": "seed-1.6-flash",
+    "display_name": "ByteDance Seed: Seed 1.6 Flash",
+    "base_url": "https://ark.cn-volces.com/api/v3"
+  },
+  {
+    "provider": "ByteDance",
+    "model_name": "seed-1.6",
+    "display_name": "ByteDance Seed: Seed 1.6",
+    "base_url": "https://ark.cn-volces.com/api/v3"
+  },
+  {
+    "provider": "MiniMax",
+    "model_name": "minimax-m2.1",
+    "display_name": "MiniMax: MiniMax M2.1",
+    "base_url": "https://api.minimax.chat/v1"
+  },
+  {
+    "provider": "Z.ai",
+    "model_name": "glm-4.7",
+    "display_name": "Z.ai: GLM 4.7",
+    "base_url": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+    "provider": "Xiaomi",
+    "model_name": "mimo-v2-flash",
+    "display_name": "Xiaomi: MiMo-V2-Flash",
+    "base_url": "https://api.xiaoai.mi.com/v1"
+  },
+  {
+    "provider": "NVIDIA",
+    "model_name": "nemotron-3-nano-30b-a3b:free",
+    "display_name": "NVIDIA: Nemotron 3 Nano 30B A3B (free)",
+    "base_url": "https://integrate.api.nvidia.com/v1"
+  },
+  {
+    "provider": "NVIDIA",
+    "model_name": "nemotron-3-nano-30b-a3b",
+    "display_name": "NVIDIA: Nemotron 3 Nano 30B A3B",
+    "base_url": "https://integrate.api.nvidia.com/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "devstral-2512",
+    "display_name": "Mistral: Devstral 2 2512",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Relace",
+    "model_name": "relace-search",
+    "display_name": "Relace: Relace Search",
+    "base_url": "https://api.relace.ai/v1"
+  },
+  {
+    "provider": "Z.ai",
+    "model_name": "glm-4.6v",
+    "display_name": "Z.ai: GLM 4.6V",
+    "base_url": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+    "provider": "Nex AGI",
+    "model_name": "deepseek-v3.1-nex-n1",
+    "display_name": "Nex AGI: DeepSeek V3.1 Nex N1",
+    "base_url": "https://api.nexagi.com/v1"
+  },
+  {
+    "provider": "EssentialAI",
+    "model_name": "rnj-1-instruct",
+    "display_name": "EssentialAI: Rnj 1 Instruct",
+    "base_url": "https://api.essential.ai/v1"
+  },
+  {
+    "provider": "OpenRouter",
+    "model_name": "bodybuilder",
+    "display_name": "Body Builder (beta)",
+    "base_url": "https://openrouter.ai/api/v1"
+  },
+  {
+    "provider": "Amazon",
+    "model_name": "nova-2-lite-v1",
+    "display_name": "Amazon: Nova 2 Lite",
+    "base_url": "https://bedrock-runtime.us-east-1.amazonaws.com"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "ministral-14b-2512",
+    "display_name": "Mistral: Ministral 3 14B 2512",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "ministral-8b-2512",
+    "display_name": "Mistral: Ministral 3 8B 2512",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "ministral-3b-2512",
+    "display_name": "Mistral: Ministral 3 3B 2512",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "mistral-large-2512",
+    "display_name": "Mistral: Mistral Large 3 2512",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Arcee AI",
+    "model_name": "trinity-mini",
+    "display_name": "Arcee AI: Trinity Mini",
+    "base_url": "https://api.arcee.ai/v1"
+  },
+  {
+    "provider": "DeepSeek",
+    "model_name": "deepseek-v3.2-speciale",
+    "display_name": "DeepSeek: DeepSeek V3.2 Speciale",
+    "base_url": "https://api.deepseek.com/v1"
+  },
+  {
+    "provider": "DeepSeek",
+    "model_name": "deepseek-v3.2",
+    "display_name": "DeepSeek: DeepSeek V3.2",
+    "base_url": "https://api.deepseek.com/v1"
+  },
+  {
+    "provider": "Prime Intellect",
+    "model_name": "intellect-3",
+    "display_name": "Prime Intellect: INTELLECT-3",
+    "base_url": "https://api.primeintellect.ai/v1"
+  },
+  {
+    "provider": "AllenAI",
+    "model_name": "olmo-3-32b-think",
+    "display_name": "AllenAI: Olmo 3 32B Think",
+    "base_url": "https://api.allenai.org/v1"
+  },
+  {
+    "provider": "xAI",
+    "model_name": "grok-4.1-fast",
+    "display_name": "xAI: Grok 4.1 Fast",
+    "base_url": "https://api.x.ai/v1"
+  },
+  {
+    "provider": "Deep Cogito",
+    "model_name": "cogito-v2.1-671b",
+    "display_name": "Deep Cogito: Cogito v2.1 671B",
+    "base_url": "https://api.deepcogito.ai/v1"
+  },
+  {
+    "provider": "MoonshotAI",
+    "model_name": "kimi-k2-thinking",
+    "display_name": "MoonshotAI: Kimi K2 Thinking",
+    "base_url": "https://api.moonshot.cn/v1"
+  },
+  {
+    "provider": "Amazon",
+    "model_name": "nova-premier-v1",
+    "display_name": "Amazon: Nova Premier 1.0",
+    "base_url": "https://bedrock-runtime.us-east-1.amazonaws.com"
+  },
+  {
+    "provider": "Perplexity",
+    "model_name": "sonar-pro-search",
+    "display_name": "Perplexity: Sonar Pro Search",
+    "base_url": "https://api.perplexity.ai"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "voxtral-small-24b-2507",
+    "display_name": "Mistral: Voxtral Small 24B 2507",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "NVIDIA",
+    "model_name": "nemotron-nano-12b-v2-vl:free",
+    "display_name": "NVIDIA: Nemotron Nano 12B 2 VL (free)",
+    "base_url": "https://integrate.api.nvidia.com/v1"
+  },
+  {
+    "provider": "NVIDIA",
+    "model_name": "nemotron-nano-12b-v2-vl",
+    "display_name": "NVIDIA: Nemotron Nano 12B 2 VL",
+    "base_url": "https://integrate.api.nvidia.com/v1"
+  },
+  {
+    "provider": "MiniMax",
+    "model_name": "minimax-m2",
+    "display_name": "MiniMax: MiniMax M2",
+    "base_url": "https://api.minimax.chat/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-vl-32b-instruct",
+    "display_name": "Qwen: Qwen3 VL 32B Instruct",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "IBM",
+    "model_name": "granite-4.0-h-micro",
+    "display_name": "IBM: Granite 4.0 Micro",
+    "base_url": "https://us-south.ml.cloud.ibm.com/ml/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-vl-8b-thinking",
+    "display_name": "Qwen: Qwen3 VL 8B Thinking",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-vl-8b-instruct",
+    "display_name": "Qwen: Qwen3 VL 8B Instruct",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "NVIDIA",
+    "model_name": "llama-3.3-nemotron-super-49b-v1.5",
+    "display_name": "NVIDIA: Llama 3.3 Nemotron Super 49B V1.5",
+    "base_url": "https://integrate.api.nvidia.com/v1"
+  },
+  {
+    "provider": "Baidu",
+    "model_name": "ernie-4.5-21b-a3b-thinking",
+    "display_name": "Baidu: ERNIE 4.5 21B A3B Thinking",
+    "base_url": "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-vl-30b-a3b-thinking",
+    "display_name": "Qwen: Qwen3 VL 30B A3B Thinking",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-vl-30b-a3b-instruct",
+    "display_name": "Qwen: Qwen3 VL 30B A3B Instruct",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Z.ai",
+    "model_name": "glm-4.6",
+    "display_name": "Z.ai: GLM 4.6",
+    "base_url": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+    "provider": "DeepSeek",
+    "model_name": "deepseek-v3.2-exp",
+    "display_name": "DeepSeek: DeepSeek V3.2 Exp",
+    "base_url": "https://api.deepseek.com/v1"
+  },
+  {
+    "provider": "TheDrummer",
+    "model_name": "cydonia-24b-v4.1",
+    "display_name": "TheDrummer: Cydonia 24B V4.1",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "Relace",
+    "model_name": "relace-apply-3",
+    "display_name": "Relace: Relace Apply 3",
+    "base_url": "https://api.relace.ai/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-vl-235b-a22b-thinking",
+    "display_name": "Qwen: Qwen3 VL 235B A22B Thinking",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-vl-235b-a22b-instruct",
+    "display_name": "Qwen: Qwen3 VL 235B A22B Instruct",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-max",
+    "display_name": "Qwen: Qwen3 Max",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-coder-plus",
+    "display_name": "Qwen: Qwen3 Coder Plus",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "DeepSeek",
+    "model_name": "deepseek-v3.1-terminus",
+    "display_name": "DeepSeek: DeepSeek V3.1 Terminus",
+    "base_url": "https://api.deepseek.com/v1"
+  },
+  {
+    "provider": "xAI",
+    "model_name": "grok-4-fast",
+    "display_name": "xAI: Grok 4 Fast",
+    "base_url": "https://api.x.ai/v1"
+  },
+  {
+    "provider": "Alibaba",
+    "model_name": "tongyi-deepresearch-30b-a3b",
+    "display_name": "Tongyi DeepResearch 30B A3B",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-coder-flash",
+    "display_name": "Qwen: Qwen3 Coder Flash",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-next-80b-a3b-thinking",
+    "display_name": "Qwen: Qwen3 Next 80B A3B Thinking",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-next-80b-a3b-instruct:free",
+    "display_name": "Qwen: Qwen3 Next 80B A3B Instruct (free)",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-next-80b-a3b-instruct",
+    "display_name": "Qwen: Qwen3 Next 80B A3B Instruct",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen-plus-2025-07-28:thinking",
+    "display_name": "Qwen: Qwen Plus 0728 (thinking)",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen-plus-2025-07-28",
+    "display_name": "Qwen: Qwen Plus 0728",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "NVIDIA",
+    "model_name": "nemotron-nano-9b-v2:free",
+    "display_name": "NVIDIA: Nemotron Nano 9B V2 (free)",
+    "base_url": "https://integrate.api.nvidia.com/v1"
+  },
+  {
+    "provider": "NVIDIA",
+    "model_name": "nemotron-nano-9b-v2",
+    "display_name": "NVIDIA: Nemotron Nano 9B V2",
+    "base_url": "https://integrate.api.nvidia.com/v1"
+  },
+  {
+    "provider": "MoonshotAI",
+    "model_name": "kimi-k2-0905",
+    "display_name": "MoonshotAI: Kimi K2 0905",
+    "base_url": "https://api.moonshot.cn/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-30b-a3b-thinking-2507",
+    "display_name": "Qwen: Qwen3 30B A3B Thinking 2507",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "xAI",
+    "model_name": "grok-code-fast-1",
+    "display_name": "xAI: Grok Code Fast 1",
+    "base_url": "https://api.x.ai/v1"
+  },
+  {
+    "provider": "Nous",
+    "model_name": "hermes-4-70b",
+    "display_name": "Nous: Hermes 4 70B",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "Nous",
+    "model_name": "hermes-4-405b",
+    "display_name": "Nous: Hermes 4 405B",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "DeepSeek",
+    "model_name": "deepseek-chat-v3.1",
+    "display_name": "DeepSeek: DeepSeek V3.1",
+    "base_url": "https://api.deepseek.com/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "mistral-medium-3.1",
+    "display_name": "Mistral: Mistral Medium 3.1",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Baidu",
+    "model_name": "ernie-4.5-21b-a3b",
+    "display_name": "Baidu: ERNIE 4.5 21B A3B",
+    "base_url": "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop"
+  },
+  {
+    "provider": "Baidu",
+    "model_name": "ernie-4.5-vl-28b-a3b",
+    "display_name": "Baidu: ERNIE 4.5 VL 28B A3B",
+    "base_url": "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop"
+  },
+  {
+    "provider": "Z.ai",
+    "model_name": "glm-4.5v",
+    "display_name": "Z.ai: GLM 4.5V",
+    "base_url": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+    "provider": "AI21",
+    "model_name": "jamba-large-1.7",
+    "display_name": "AI21: Jamba Large 1.7",
+    "base_url": "https://api.ai21.com/studio/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "codestral-2508",
+    "display_name": "Mistral: Codestral 2508",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-coder-30b-a3b-instruct",
+    "display_name": "Qwen: Qwen3 Coder 30B A3B Instruct",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-30b-a3b-instruct-2507",
+    "display_name": "Qwen: Qwen3 30B A3B Instruct 2507",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Z.ai",
+    "model_name": "glm-4.5",
+    "display_name": "Z.ai: GLM 4.5",
+    "base_url": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+    "provider": "Z.ai",
+    "model_name": "glm-4.5-air:free",
+    "display_name": "Z.ai: GLM 4.5 Air (free)",
+    "base_url": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+    "provider": "Z.ai",
+    "model_name": "glm-4.5-air",
+    "display_name": "Z.ai: GLM 4.5 Air",
+    "base_url": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-235b-a22b-thinking-2507",
+    "display_name": "Qwen: Qwen3 235B A22B Thinking 2507",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Z.ai",
+    "model_name": "glm-4-32b",
+    "display_name": "Z.ai: GLM 4 32B ",
+    "base_url": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-coder:free",
+    "display_name": "Qwen: Qwen3 Coder 480B A35B (free)",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-coder",
+    "display_name": "Qwen: Qwen3 Coder 480B A35B",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "ByteDance",
+    "model_name": "ui-tars-1.5-7b",
+    "display_name": "ByteDance: UI-TARS 7B ",
+    "base_url": "https://ark.cn-volces.com/api/v3"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-235b-a22b-2507",
+    "display_name": "Qwen: Qwen3 235B A22B Instruct 2507",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "OpenRouter",
+    "model_name": "router",
+    "display_name": "Switchpoint Router",
+    "base_url": "https://openrouter.ai/api/v1"
+  },
+  {
+    "provider": "MoonshotAI",
+    "model_name": "kimi-k2",
+    "display_name": "MoonshotAI: Kimi K2 0711",
+    "base_url": "https://api.moonshot.cn/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "devstral-medium",
+    "display_name": "Mistral: Devstral Medium",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "devstral-small",
+    "display_name": "Mistral: Devstral Small 1.1",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Venice",
+    "model_name": "dolphin-mistral-24b-venice-edition:free",
+    "display_name": "Venice: Uncensored (free)",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "xAI",
+    "model_name": "grok-4",
+    "display_name": "xAI: Grok 4",
+    "base_url": "https://api.x.ai/v1"
+  },
+  {
+    "provider": "Tencent",
+    "model_name": "hunyuan-a13b-instruct",
+    "display_name": "Tencent: Hunyuan A13B Instruct",
+    "base_url": "https://hunyuan.tencentcloudapi.com"
+  },
+  {
+    "provider": "TNG",
+    "model_name": "deepseek-r1t2-chimera",
+    "display_name": "TNG: DeepSeek R1T2 Chimera",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "Morph",
+    "model_name": "morph-v3-large",
+    "display_name": "Morph: Morph V3 Large",
+    "base_url": "https://api.morph.ai/v1"
+  },
+  {
+    "provider": "Morph",
+    "model_name": "morph-v3-fast",
+    "display_name": "Morph: Morph V3 Fast",
+    "base_url": "https://api.morph.ai/v1"
+  },
+  {
+    "provider": "Baidu",
+    "model_name": "ernie-4.5-vl-424b-a47b",
+    "display_name": "Baidu: ERNIE 4.5 VL 424B A47B ",
+    "base_url": "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop"
+  },
+  {
+    "provider": "Baidu",
+    "model_name": "ernie-4.5-300b-a47b",
+    "display_name": "Baidu: ERNIE 4.5 300B A47B ",
+    "base_url": "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "mistral-small-3.2-24b-instruct",
+    "display_name": "Mistral: Mistral Small 3.2 24B",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "MiniMax",
+    "model_name": "minimax-m1",
+    "display_name": "MiniMax: MiniMax M1",
+    "base_url": "https://api.minimax.chat/v1"
+  },
+  {
+    "provider": "xAI",
+    "model_name": "grok-3-mini",
+    "display_name": "xAI: Grok 3 Mini",
+    "base_url": "https://api.x.ai/v1"
+  },
+  {
+    "provider": "xAI",
+    "model_name": "grok-3",
+    "display_name": "xAI: Grok 3",
+    "base_url": "https://api.x.ai/v1"
+  },
+  {
+    "provider": "DeepSeek",
+    "model_name": "deepseek-r1-0528",
+    "display_name": "DeepSeek: R1 0528",
+    "base_url": "https://api.deepseek.com/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "mistral-medium-3",
+    "display_name": "Mistral: Mistral Medium 3",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Arcee AI",
+    "model_name": "spotlight",
+    "display_name": "Arcee AI: Spotlight",
+    "base_url": "https://api.arcee.ai/v1"
+  },
+  {
+    "provider": "Arcee AI",
+    "model_name": "maestro-reasoning",
+    "display_name": "Arcee AI: Maestro Reasoning",
+    "base_url": "https://api.arcee.ai/v1"
+  },
+  {
+    "provider": "Arcee AI",
+    "model_name": "virtuoso-large",
+    "display_name": "Arcee AI: Virtuoso Large",
+    "base_url": "https://api.arcee.ai/v1"
+  },
+  {
+    "provider": "Arcee AI",
+    "model_name": "coder-large",
+    "display_name": "Arcee AI: Coder Large",
+    "base_url": "https://api.arcee.ai/v1"
+  },
+  {
+    "provider": "Meta",
+    "model_name": "llama-guard-4-12b",
+    "display_name": "Meta: Llama Guard 4 12B",
+    "base_url": "https://api.meta.ai/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-30b-a3b",
+    "display_name": "Qwen: Qwen3 30B A3B",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-8b",
+    "display_name": "Qwen: Qwen3 8B",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-14b",
+    "display_name": "Qwen: Qwen3 14B",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-32b",
+    "display_name": "Qwen: Qwen3 32B",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen3-235b-a22b",
+    "display_name": "Qwen: Qwen3 235B A22B",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "AlfredPros",
+    "model_name": "codellama-7b-instruct-solidity",
+    "display_name": "AlfredPros: CodeLLaMa 7B Instruct Solidity",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "xAI",
+    "model_name": "grok-3-mini-beta",
+    "display_name": "xAI: Grok 3 Mini Beta",
+    "base_url": "https://api.x.ai/v1"
+  },
+  {
+    "provider": "xAI",
+    "model_name": "grok-3-beta",
+    "display_name": "xAI: Grok 3 Beta",
+    "base_url": "https://api.x.ai/v1"
+  },
+  {
+    "provider": "Meta",
+    "model_name": "llama-4-maverick",
+    "display_name": "Meta: Llama 4 Maverick",
+    "base_url": "https://api.meta.ai/v1"
+  },
+  {
+    "provider": "Meta",
+    "model_name": "llama-4-scout",
+    "display_name": "Meta: Llama 4 Scout",
+    "base_url": "https://api.meta.ai/v1"
+  },
+  {
+    "provider": "DeepSeek",
+    "model_name": "deepseek-chat-v3-0324",
+    "display_name": "DeepSeek: DeepSeek V3 0324",
+    "base_url": "https://api.deepseek.com/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "mistral-small-3.1-24b-instruct",
+    "display_name": "Mistral: Mistral Small 3.1 24B",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Cohere",
+    "model_name": "command-a",
+    "display_name": "Cohere: Command A",
+    "base_url": "https://api.cohere.ai/v1"
+  },
+  {
+    "provider": "Reka AI",
+    "model_name": "reka-flash-3",
+    "display_name": "Reka Flash 3",
+    "base_url": "https://api.reka.ai/v1"
+  },
+  {
+    "provider": "TheDrummer",
+    "model_name": "skyfall-36b-v2",
+    "display_name": "TheDrummer: Skyfall 36B V2",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "Perplexity",
+    "model_name": "sonar-reasoning-pro",
+    "display_name": "Perplexity: Sonar Reasoning Pro",
+    "base_url": "https://api.perplexity.ai"
+  },
+  {
+    "provider": "Perplexity",
+    "model_name": "sonar-pro",
+    "display_name": "Perplexity: Sonar Pro",
+    "base_url": "https://api.perplexity.ai"
+  },
+  {
+    "provider": "Perplexity",
+    "model_name": "sonar-deep-research",
+    "display_name": "Perplexity: Sonar Deep Research",
+    "base_url": "https://api.perplexity.ai"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "mistral-saba",
+    "display_name": "Mistral: Saba",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Meta",
+    "model_name": "llama-guard-3-8b",
+    "display_name": "Llama Guard 3 8B",
+    "base_url": "https://api.meta.ai/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen-vl-plus",
+    "display_name": "Qwen: Qwen VL Plus",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "AionLabs",
+    "model_name": "aion-1.0",
+    "display_name": "AionLabs: Aion-1.0",
+    "base_url": "https://api.aionlabs.com/v1"
+  },
+  {
+    "provider": "AionLabs",
+    "model_name": "aion-1.0-mini",
+    "display_name": "AionLabs: Aion-1.0-Mini",
+    "base_url": "https://api.aionlabs.com/v1"
+  },
+  {
+    "provider": "AionLabs",
+    "model_name": "aion-rp-llama-3.1-8b",
+    "display_name": "AionLabs: Aion-RP 1.0 (8B)",
+    "base_url": "https://api.aionlabs.com/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen-vl-max",
+    "display_name": "Qwen: Qwen VL Max",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen-turbo",
+    "display_name": "Qwen: Qwen-Turbo",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen2.5-vl-72b-instruct",
+    "display_name": "Qwen: Qwen2.5 VL 72B Instruct",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen-plus",
+    "display_name": "Qwen: Qwen-Plus",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen-max",
+    "display_name": "Qwen: Qwen-Max",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "mistral-small-24b-instruct-2501",
+    "display_name": "Mistral: Mistral Small 3",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "DeepSeek",
+    "model_name": "deepseek-r1-distill-qwen-32b",
+    "display_name": "DeepSeek: R1 Distill Qwen 32B",
+    "base_url": "https://api.deepseek.com/v1"
+  },
+  {
+    "provider": "Perplexity",
+    "model_name": "sonar",
+    "display_name": "Perplexity: Sonar",
+    "base_url": "https://api.perplexity.ai"
+  },
+  {
+    "provider": "DeepSeek",
+    "model_name": "deepseek-r1-distill-llama-70b",
+    "display_name": "DeepSeek: R1 Distill Llama 70B",
+    "base_url": "https://api.deepseek.com/v1"
+  },
+  {
+    "provider": "DeepSeek",
+    "model_name": "deepseek-r1",
+    "display_name": "DeepSeek: R1",
+    "base_url": "https://api.deepseek.com/v1"
+  },
+  {
+    "provider": "MiniMax",
+    "model_name": "minimax-01",
+    "display_name": "MiniMax: MiniMax-01",
+    "base_url": "https://api.minimax.chat/v1"
+  },
+  {
+    "provider": "Microsoft",
+    "model_name": "phi-4",
+    "display_name": "Microsoft: Phi 4",
+    "base_url": "https://models.inference.ai.azure.com"
+  },
+  {
+    "provider": "Sao10K",
+    "model_name": "l3.1-70b-hanami-x1",
+    "display_name": "Sao10K: Llama 3.1 70B Hanami x1",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "DeepSeek",
+    "model_name": "deepseek-chat",
+    "display_name": "DeepSeek: DeepSeek V3",
+    "base_url": "https://api.deepseek.com/v1"
+  },
+  {
+    "provider": "Sao10K",
+    "model_name": "l3.3-euryale-70b",
+    "display_name": "Sao10K: Llama 3.3 Euryale 70B",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "Cohere",
+    "model_name": "command-r7b-12-2024",
+    "display_name": "Cohere: Command R7B (12-2024)",
+    "base_url": "https://api.cohere.ai/v1"
+  },
+  {
+    "provider": "Meta",
+    "model_name": "llama-3.3-70b-instruct:free",
+    "display_name": "Meta: Llama 3.3 70B Instruct (free)",
+    "base_url": "https://api.meta.ai/v1"
+  },
+  {
+    "provider": "Meta",
+    "model_name": "llama-3.3-70b-instruct",
+    "display_name": "Meta: Llama 3.3 70B Instruct",
+    "base_url": "https://api.meta.ai/v1"
+  },
+  {
+    "provider": "Amazon",
+    "model_name": "nova-lite-v1",
+    "display_name": "Amazon: Nova Lite 1.0",
+    "base_url": "https://bedrock-runtime.us-east-1.amazonaws.com"
+  },
+  {
+    "provider": "Amazon",
+    "model_name": "nova-micro-v1",
+    "display_name": "Amazon: Nova Micro 1.0",
+    "base_url": "https://bedrock-runtime.us-east-1.amazonaws.com"
+  },
+  {
+    "provider": "Amazon",
+    "model_name": "nova-pro-v1",
+    "display_name": "Amazon: Nova Pro 1.0",
+    "base_url": "https://bedrock-runtime.us-east-1.amazonaws.com"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "mistral-large-2411",
+    "display_name": "Mistral Large 2411",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "mistral-large-2407",
+    "display_name": "Mistral Large 2407",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "pixtral-large-2411",
+    "display_name": "Mistral: Pixtral Large 2411",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen-2.5-coder-32b-instruct",
+    "display_name": "Qwen2.5 Coder 32B Instruct",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "TheDrummer",
+    "model_name": "unslopnemo-12b",
+    "display_name": "TheDrummer: UnslopNemo 12B",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "Anthracite",
+    "model_name": "magnum-v4-72b",
+    "display_name": "Magnum v4 72B",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen-2.5-7b-instruct",
+    "display_name": "Qwen: Qwen2.5 7B Instruct",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "NVIDIA",
+    "model_name": "llama-3.1-nemotron-70b-instruct",
+    "display_name": "NVIDIA: Llama 3.1 Nemotron 70B Instruct",
+    "base_url": "https://integrate.api.nvidia.com/v1"
+  },
+  {
+    "provider": "Inflection",
+    "model_name": "inflection-3-productivity",
+    "display_name": "Inflection: Inflection 3 Productivity",
+    "base_url": "https://api.inflection.ai/v1"
+  },
+  {
+    "provider": "Inflection",
+    "model_name": "inflection-3-pi",
+    "display_name": "Inflection: Inflection 3 Pi",
+    "base_url": "https://api.inflection.ai/v1"
+  },
+  {
+    "provider": "TheDrummer",
+    "model_name": "rocinante-12b",
+    "display_name": "TheDrummer: Rocinante 12B",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "Meta",
+    "model_name": "llama-3.2-3b-instruct:free",
+    "display_name": "Meta: Llama 3.2 3B Instruct (free)",
+    "base_url": "https://api.meta.ai/v1"
+  },
+  {
+    "provider": "Meta",
+    "model_name": "llama-3.2-3b-instruct",
+    "display_name": "Meta: Llama 3.2 3B Instruct",
+    "base_url": "https://api.meta.ai/v1"
+  },
+  {
+    "provider": "Meta",
+    "model_name": "llama-3.2-1b-instruct",
+    "display_name": "Meta: Llama 3.2 1B Instruct",
+    "base_url": "https://api.meta.ai/v1"
+  },
+  {
+    "provider": "Meta",
+    "model_name": "llama-3.2-11b-vision-instruct",
+    "display_name": "Meta: Llama 3.2 11B Vision Instruct",
+    "base_url": "https://api.meta.ai/v1"
+  },
+  {
+    "provider": "Qwen",
+    "model_name": "qwen-2.5-72b-instruct",
+    "display_name": "Qwen2.5 72B Instruct",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  {
+    "provider": "Cohere",
+    "model_name": "command-r-plus-08-2024",
+    "display_name": "Cohere: Command R+ (08-2024)",
+    "base_url": "https://api.cohere.ai/v1"
+  },
+  {
+    "provider": "Cohere",
+    "model_name": "command-r-08-2024",
+    "display_name": "Cohere: Command R (08-2024)",
+    "base_url": "https://api.cohere.ai/v1"
+  },
+  {
+    "provider": "Sao10K",
+    "model_name": "l3.1-euryale-70b",
+    "display_name": "Sao10K: Llama 3.1 Euryale 70B v2.2",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "Nous",
+    "model_name": "hermes-3-llama-3.1-70b",
+    "display_name": "Nous: Hermes 3 70B Instruct",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "Nous",
+    "model_name": "hermes-3-llama-3.1-405b:free",
+    "display_name": "Nous: Hermes 3 405B Instruct (free)",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "Nous",
+    "model_name": "hermes-3-llama-3.1-405b",
+    "display_name": "Nous: Hermes 3 405B Instruct",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "Sao10K",
+    "model_name": "l3-lunaris-8b",
+    "display_name": "Sao10K: Llama 3 8B Lunaris",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "Meta",
+    "model_name": "llama-3.1-8b-instruct",
+    "display_name": "Meta: Llama 3.1 8B Instruct",
+    "base_url": "https://api.meta.ai/v1"
+  },
+  {
+    "provider": "Meta",
+    "model_name": "llama-3.1-70b-instruct",
+    "display_name": "Meta: Llama 3.1 70B Instruct",
+    "base_url": "https://api.meta.ai/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "mistral-nemo",
+    "display_name": "Mistral: Mistral Nemo",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Sao10k",
+    "model_name": "l3-euryale-70b",
+    "display_name": "Sao10k: Llama 3 Euryale 70B v2.1",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "NousResearch",
+    "model_name": "hermes-2-pro-llama-3-8b",
+    "display_name": "NousResearch: Hermes 2 Pro - Llama-3 8B",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "Meta",
+    "model_name": "llama-3-8b-instruct",
+    "display_name": "Meta: Llama 3 8B Instruct",
+    "base_url": "https://api.meta.ai/v1"
+  },
+  {
+    "provider": "Meta",
+    "model_name": "llama-3-70b-instruct",
+    "display_name": "Meta: Llama 3 70B Instruct",
+    "base_url": "https://api.meta.ai/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "mixtral-8x22b-instruct",
+    "display_name": "Mistral: Mixtral 8x22B Instruct",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Microsoft",
+    "model_name": "wizardlm-2-8x22b",
+    "display_name": "WizardLM-2 8x22B",
+    "base_url": "https://models.inference.ai.azure.com"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "mistral-large",
+    "display_name": "Mistral Large",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "mixtral-8x7b-instruct",
+    "display_name": "Mistral: Mixtral 8x7B Instruct",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Alpindale",
+    "model_name": "goliath-120b",
+    "display_name": "Goliath 120B",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "OpenRouter",
+    "model_name": "auto",
+    "display_name": "Auto Router",
+    "base_url": "https://openrouter.ai/api/v1"
+  },
+  {
+    "provider": "Mistral",
+    "model_name": "mistral-7b-instruct-v0.1",
+    "display_name": "Mistral: Mistral 7B Instruct v0.1",
+    "base_url": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "Mancer",
+    "model_name": "weaver",
+    "display_name": "Mancer: Weaver (alpha)",
+    "base_url": "https://api.mancer.tech/v1"
+  },
+  {
+    "provider": "Undi95",
+    "model_name": "remm-slerp-l2-13b",
+    "display_name": "ReMM SLERP 13B",
+    "base_url": "https://api.huggingface.co/v1"
+  },
+  {
+    "provider": "Gryphe",
+    "model_name": "mythomax-l2-13b",
+    "display_name": "MythoMax 13B",
+    "base_url": "https://api.huggingface.co/v1"
+  }
+]
