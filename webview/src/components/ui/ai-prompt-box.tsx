@@ -1,9 +1,29 @@
 import React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { ArrowUp, Paperclip, Square, X, StopCircle, Mic, Globe, BrainCog, FolderCode, File, Folder } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { ArrowUp, Square, X, File, Folder } from "lucide-react";
+import { motion } from "framer-motion";
 import type { WorkspaceFileEntry } from "../../hooks/useExtensionBridge";
+
+// interface WebkitSpeechRecognitionEvent {
+//   resultIndex: number;
+//   results: {
+//     length: number;
+//     [index: number]: { isFinal: boolean; [index: number]: { transcript: string } };
+//   };
+// }
+
+// interface WebkitSpeechRecognitionInstance {
+//   continuous: boolean;
+//   interimResults: boolean;
+//   lang: string;
+//   onresult: ((event: WebkitSpeechRecognitionEvent) => void) | null;
+//   onerror: ((event: { error: string; message?: string }) => void) | null;
+//   onend: (() => void) | null;
+//   start(): void;
+//   stop(): void;
+//   abort(): void;
+// }
 
 // Utility function for className merging
 const cn = (...classes: (string | undefined | null | false)[]) => classes.filter(Boolean).join(" ");
@@ -162,14 +182,10 @@ Button.displayName = "Button";
 // VoiceRecorder Component
 interface VoiceRecorderProps {
   isRecording: boolean;
-  onStartRecording: () => void;
-  onStopRecording: (duration: number) => void;
   visualizerBars?: number;
 }
 const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   isRecording,
-  onStartRecording,
-  onStopRecording,
   visualizerBars = 32,
 }) => {
   const [time, setTime] = React.useState(0);
@@ -177,20 +193,18 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
 
   React.useEffect(() => {
     if (isRecording) {
-      onStartRecording();
       timerRef.current = setInterval(() => setTime((t) => t + 1), 1000);
     } else {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
-      onStopRecording(time);
       setTime(0);
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isRecording, time, onStartRecording, onStopRecording]);
+  }, [isRecording]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -379,16 +393,16 @@ const PromptInputAction: React.FC<PromptInputActionProps> = ({
 };
 
 // Custom Divider Component
-const CustomDivider: React.FC = () => (
-  <div className="relative h-6 w-[1.5px] mx-1">
-    <div
-      className="absolute inset-0 bg-gradient-to-t from-transparent via-[#9b87f5]/70 to-transparent rounded-full"
-      style={{
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 40%, 140% 50%, 100% 60%, 100% 100%, 0% 100%, 0% 60%, -40% 50%, 0% 40%)",
-      }}
-    />
-  </div>
-);
+// const CustomDivider: React.FC = () => (
+//   <div className="relative h-6 w-[1.5px] mx-1">
+//     <div
+//       className="absolute inset-0 bg-gradient-to-t from-transparent via-[#9b87f5]/70 to-transparent rounded-full"
+//       style={{
+//         clipPath: "polygon(0% 0%, 100% 0%, 100% 40%, 140% 50%, 100% 60%, 100% 100%, 0% 100%, 0% 60%, -40% 50%, 0% 40%)",
+//       }}
+//     />
+//   </div>
+// );
 
 interface FileMentionDropdownProps {
   files: WorkspaceFileEntry[];
@@ -473,7 +487,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
   const {
     onSend = () => {},
     isLoading = false,
-    placeholder = "Type your message here...",
+    placeholder = "Type your message here... Use @ to mention files or folders",
     className,
     initialValue = "",
     value,
@@ -484,11 +498,11 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
   const [files, setFiles] = React.useState<File[]>([]);
   const [filePreviews, setFilePreviews] = React.useState<{ [key: string]: string }>({});
   const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
-  const [isRecording, setIsRecording] = React.useState(false);
-  const [showSearch, setShowSearch] = React.useState(false);
-  const [showThink, setShowThink] = React.useState(false);
-  const [showCanvas, setShowCanvas] = React.useState(false);
-  const uploadInputRef = React.useRef<HTMLInputElement>(null);
+  const [isRecording] = React.useState(false);
+  // const [showSearch, setShowSearch] = React.useState(false);
+  // const [showThink, setShowThink] = React.useState(false);
+  // const [showCanvas, setShowCanvas] = React.useState(false);
+  // const uploadInputRef = React.useRef<HTMLInputElement>(null);
   const promptBoxRef = React.useRef<HTMLDivElement>(null);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const mirrorRef = React.useRef<HTMLDivElement>(null);
@@ -621,17 +635,17 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
     return parts;
   };
 
-  const handleToggleChange = (value: string) => {
-    if (value === "search") {
-      setShowSearch((prev) => !prev);
-      setShowThink(false);
-    } else if (value === "think") {
-      setShowThink((prev) => !prev);
-      setShowSearch(false);
-    }
-  };
+  // const handleToggleChange = (value: string) => {
+  //   if (value === "search") {
+  //     setShowSearch((prev) => !prev);
+  //     setShowThink(false);
+  //   } else if (value === "think") {
+  //     setShowThink((prev) => !prev);
+  //     setShowSearch(false);
+  //   }
+  // };
 
-  const handleCanvasToggle = () => setShowCanvas((prev) => !prev);
+  // const handleCanvasToggle = () => setShowCanvas((prev) => !prev);
 
   const isImageFile = (file: File) => file.type.startsWith("image/");
 
@@ -698,12 +712,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
 
   const handleSubmit = () => {
     if (internalValue.trim() || files.length > 0) {
-      let messagePrefix = "";
-      if (showSearch) messagePrefix = "[Search: ";
-      else if (showThink) messagePrefix = "[Think: ";
-      else if (showCanvas) messagePrefix = "[Canvas: ";
-      const formattedInput = messagePrefix ? `${messagePrefix}${internalValue}]` : internalValue;
-      onSend(formattedInput, files);
+      onSend(internalValue, files);
       setInternalValue("");
       setFiles([]);
       setFilePreviews({});
@@ -711,13 +720,17 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
     }
   };
 
-  const handleStartRecording = () => console.log("Started recording");
+  // const recognitionRef = React.useRef<WebkitSpeechRecognitionInstance | null>(null);
+  // const mediaStreamRef = React.useRef<MediaStream | null>(null);
+  // const stoppedManuallyRef = React.useRef(false);
 
-  const handleStopRecording = (duration: number) => {
-    console.log(`Stopped recording after ${duration} seconds`);
-    setIsRecording(false);
-    onSend(`[Voice message - ${duration} seconds]`, []);
-  };
+  // const handleStartRecording = React.useCallback(async () => {
+  //   ...
+  // }, [props.onValueChange]);
+
+  // const handleStopRecording = React.useCallback(() => {
+  //   ...
+  // }, []);
 
   const hasContent = internalValue.trim() !== "" || files.length > 0;
 
@@ -738,13 +751,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [mentionState]);
 
-  const currentPlaceholder = showSearch
-    ? "Search the web..."
-    : showThink
-    ? "Think deeply..."
-    : showCanvas
-    ? "Create on canvas..."
-    : placeholder;
+  const currentPlaceholder = placeholder;
 
   const maxTextareaHeight = 240;
 
@@ -873,8 +880,6 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
           {isRecording && (
             <VoiceRecorder
               isRecording={isRecording}
-              onStartRecording={handleStartRecording}
-              onStopRecording={handleStopRecording}
             />
           )}
 
@@ -885,7 +890,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                 isRecording ? "opacity-0 invisible h-0" : "opacity-100 visible"
               )}
             >
-              <PromptInputAction tooltip="Upload image">
+              {/* <PromptInputAction tooltip="Upload image">
                 <button
                   onClick={() => uploadInputRef.current?.click()}
                   className="flex h-8 w-8 text-[#9CA3AF] cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-gray-600/30 hover:text-[#D1D5DB]"
@@ -903,9 +908,9 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                     accept="image/*"
                   />
                 </button>
-              </PromptInputAction>
+              </PromptInputAction> */}
 
-              <div className="flex items-center">
+              {/* <div className="flex items-center">
                 <button
                   type="button"
                   onClick={() => handleToggleChange("search")}
@@ -1011,18 +1016,14 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                     )}
                   </AnimatePresence>
                 </button>
-              </div>
+              </div> */}
             </div>
 
             <PromptInputAction
               tooltip={
                 isLoading
                   ? "Stop generation"
-                  : isRecording
-                  ? "Stop recording"
-                  : hasContent
-                  ? "Send message"
-                  : "Voice message"
+                  : "Send message"
               }
             >
               <Button
@@ -1030,27 +1031,19 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                 size="icon"
                 className={cn(
                   "h-8 w-8 rounded-full transition-all duration-200",
-                  isRecording
-                    ? "bg-transparent hover:bg-gray-600/30 text-red-500 hover:text-red-400"
-                    : hasContent
+                  hasContent
                     ? "bg-white hover:bg-white/80 text-[#1F2023]"
                     : "bg-transparent hover:bg-gray-600/30 text-[#9CA3AF] hover:text-[#D1D5DB]"
                 )}
                 onClick={() => {
-                  if (isRecording) setIsRecording(false);
-                  else if (hasContent) handleSubmit();
-                  else setIsRecording(true);
+                  if (hasContent) handleSubmit();
                 }}
-                disabled={isLoading && !hasContent}
+                disabled={isLoading || !hasContent}
               >
                 {isLoading ? (
                   <Square className="h-4 w-4 fill-[#1F2023] animate-pulse" />
-                ) : isRecording ? (
-                  <StopCircle className="h-5 w-5 text-red-500" />
-                ) : hasContent ? (
-                  <ArrowUp className="h-4 w-4 text-[#1F2023]" />
                 ) : (
-                  <Mic className="h-5 w-5 text-[#1F2023] transition-colors" />
+                  <ArrowUp className="h-4 w-4 text-[#1F2023]" />
                 )}
               </Button>
             </PromptInputAction>

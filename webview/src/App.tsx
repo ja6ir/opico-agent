@@ -131,7 +131,7 @@ export default function App() {
               <PromptInputBox
                 onSend={handleSend}
                 isLoading={isLoading}
-                placeholder="Ask me to build, refactor, or explain..."
+                placeholder="Ask me to build, refactor, or explain... Use @ to mention files or folders"
                 value={inputValue}
                 onValueChange={setInputValue}
                 workspaceFiles={workspaceFiles}
@@ -167,7 +167,7 @@ export default function App() {
               <PromptInputBox
                 onSend={handleSend}
                 isLoading={isLoading}
-                placeholder="Reply to Opico Agent..."
+                placeholder="Reply to Opico Agent... Use @ to mention files or folders"
                 value={inputValue}
                 onValueChange={setInputValue}
                 workspaceFiles={workspaceFiles}

@@ -466,6 +466,7 @@ export class ChatWebviewProvider implements vscode.WebviewViewProvider {
         script-src 'nonce-${nonce}';
         font-src ${webview.cspSource};
         img-src ${webview.cspSource} https:;
+        media-src *;
       "
     />
     <link rel="stylesheet" href="${styleUri}" />
