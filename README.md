@@ -1,123 +1,100 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![VS Code](https://img.shields.io/badge/VS%20Code-Extension-blue?logo=visual-studio-code)](https://marketplace.visualstudio.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue?logo=typescript)](https://www.typescriptlang.org/)
+
 # Opico Agent
 
-An autonomous AI coding agent for VS Code. Powered by the [Vercel AI SDK](https://sdk.vercel.ai/) with multi-provider support (Anthropic, OpenAI, Google Gemini, Vertex, and any OpenAI-compatible endpoint), it runs multi-step tool-use loops directly inside your IDE.
+**Opico Agent** is an autonomous AI coding assistant that lives directly inside your VS Code workspace. 
 
-## Features
+Powered by the [Vercel AI SDK](https://sdk.vercel.ai/), Opico goes beyond standard autocomplete or chat. It utilizes a powerful multi-step tool-use loop to autonomously explore your codebase, execute commands, and refactor files. Whether you are using Anthropic, OpenAI, Google Gemini, Vertex, or a local open-source model, Opico Agent adapts to your workflow.
 
-- **Multi-step agentic loop** — up to 25 tool-call iterations per session, driven by `streamText`'s `stopWhen` / `fullStream` API
-- **Sequential event stream** — text deltas, reasoning traces, tool calls, and tool results render in the order they occur, with no message-bubble wrapping
-- **Markdown rendering** — all assistant text is parsed through `react-markdown` for clean formatting
-- **Collapsible reasoning** — thinking/reasoning chunks render in a collapsible `<details>` block
-- **Merged tool badges** — a tool call and its result merge into a single badge that updates in-place (spinner → result/error)
-- **5 built-in tools**: `read_file`, `replace_in_file`, `execute_command`, `search_workspace`, `list_directory`
-- **50+ pre-configured models** via `models.json` (OpenRouter, Together, NVIDIA, DeepSeek, Qwen, Moonshot, and more)
-- **OpenAI-compatible provider** — add any endpoint with custom base URL and model name
+## ✨ Key Features
 
-## Architecture
+*   **Autonomous Multi-Step Execution:** Give the agent a complex objective, and it will iterate up to 25 times per session—chaining tools, reading context, and verifying results without needing constant prompting.
+*   **Provider Agnostic:** Out-of-the-box support for the leading AI providers, plus 50+ pre-configured models (via OpenRouter, Together, DeepSeek, etc.). You can easily plug in any OpenAI-compatible endpoint for local models (like Ollama).
+*   **Live Action & Reasoning:** Watch the agent think and act in real-time. Reasoning traces are neatly tucked into collapsible blocks, and tool executions (like running terminal commands) merge seamlessly into the chat stream with live status indicators.
+*   **Built-in Workspace Tools:** The agent comes equipped with a core set of file-system tools allowing it to act as an independent developer:
+    *   `read_file`
+    *   `replace_in_file`
+    *   `execute_command`
+    *   `search_workspace`
+    *   `list_directory`
 
-```
-opico-agent/
-├── src/                          # VS Code extension (Node/TypeScript)
-│   ├── extension.ts               # Entry point, registers ChatWebviewProvider
-│   ├── llm/
-│   │   └── AgentService.ts       # Orchestrates streamText, fullStream iteration,
-│   │                               # event-to-callback bridge, conversation history
-│   ├── providers/
-│   │   └── ChatWebviewProvider.ts # Webview lifecycle + postMessage relay
-│   └── tools/
-│       ├── BaseTool.ts            # Abstract base class for all tools (Zod schema)
-│       ├── ToolRegistry.ts        # Converts BaseTool[] → AI SDK Tool map
-│       ├── ReadFileTool.ts
-│       ├── ReplaceInFileTool.ts
-│       ├── ExecuteCommandTool.ts
-│       ├── SearchWorkspaceTool.ts
-│       └── ListDirectoryTool.ts
-├── webview/                       # React frontend (Vite + Tailwind)
-│   └── src/
-│       ├── App.tsx                # Main layout, initial screen, message list
-│       ├── hooks/
-│       │   └── useExtensionBridge.ts  # postMessage sync, ChatEntry state management
-│       └── components/
-│           ├── ChatMessage.tsx    # Sequential rendering: text, reasoning, tool badges
-│           ├── ToolBadge.tsx      # Merged call+result badge with spinner/checkmark
-│           ├── SettingsModal.tsx  # Provider/model/API key configuration
-│           └── ui/ai-prompt-box.tsx
-├── models.json                    # Pre-configured OpenAI-compatible model list
-├── package.json
-└── tsconfig.json
-```
+## ⚙️ Configuration
 
-## How It Works
+You can easily configure your preferred provider, model, and API keys directly via the extension's Settings modal (the gear icon in the webview) or through your VS Code `settings.json`:
 
-1. User types a prompt in the webview input
-2. `useExtensionBridge` sends `SEND_PROMPT` to the extension host via `postMessage`
-3. `AgentService.sendMessage` calls `streamText` with the full `ModelMessage[]` history
-4. `result.fullStream` yields typed events: `text-delta`, `reasoning-delta`, `tool-call`, `tool-result`, `start-step`, `finish-step`
-5. Each event is relayed to the webview as `AGENT_EVENT` via `postMessage`
-6. The hook accumulates events into `ChatEntry[]` — either a `UserMessage` or an `AssistantTurn` with a sequential `AgentStreamEvent[]`
-7. `ChatMessage` collates events into `CollatedSegment[]` (merged text, reasoning, tool segments) and renders them with `react-markdown`
+*   `opico-agent.modelProvider` — Choose from `anthropic`, `openai`, `google`, `vertex`, or `openai-compatible`.
+*   `opico-agent.modelName` — Specify the model (e.g., `claude-3-5-sonnet-20241022`, `gpt-4o`).
+*   `opico-agent.apiKey` — Your provider API key (securely falls back to environment variables).
+*   `opico-agent.apiBaseUrl` — Custom base URL for OpenAI-compatible providers.
 
-## Tool Schema Auto-generation
+## 🛠️ Development
 
-Each `BaseTool` subclass declares a `schema: T` (a Zod object). `ToolRegistry.getTools()` wraps it with:
-
-```ts
-tool({
-  description: toolInstance.description,
-  inputSchema: zodSchema(toolInstance.schema),
-  execute: async (params) => { ... }
-})
-```
-
-The AI SDK's `asSchema` function handles both Zod v3 and v4, extracting the JSON schema to send to the LLM provider.
-
-## Development
+Opico Agent is built with TypeScript, utilizing a Node.js extension host and a Vite + Tailwind React frontend.
 
 ```bash
-# Install dependencies
+# 1. Install dependencies for both the extension and the webview
 npm install
 cd webview && npm install && cd ..
 
-# Build both extension + webview
+# 2. Build the project
 npm run build
 
-# Watch mode (extension + webview in parallel)
+# 3. Run watch mode (compiles extension + webview in parallel for active development)
 npm run dev
-
-# Compile extension only
-npm run compile
-
-# Lint
-npm run lint
 ```
 
-## Configuration
+### Adding Custom Tools
 
-Set provider, model, and API key via the Settings modal (gear icon) or VS Code settings:
+The agent is highly extensible. To give the agent new capabilities, simply extend the `BaseTool` class, define your Zod schema, and register it. The agent will automatically understand how and when to use it.
 
-- `opico-agent.modelProvider` — `anthropic`, `openai`, `google`, `vertex`, `openai-compatible`
-- `opico-agent.modelName` — e.g. `claude-3-5-sonnet-20241022`, `gpt-4o`
-- `opico-agent.apiKey` — provider API key (falls back to env vars)
-- `opico-agent.apiBaseUrl` — for OpenAI-compatible providers
+```typescript
+import { z } from "zod";
+import { BaseTool } from "./tools/BaseTool";
 
-## Adding Tools
+const MySchema = z.object({
+  // Define the inputs your tool requires from the LLM
+});
 
-Extend `BaseTool<T>` and register in `AgentService.constructor`:
-
-```ts
 export class MyTool extends BaseTool<typeof MySchema> {
   name = "my_tool";
-  description = "Does something useful";
+  description = "A clear description so the LLM knows when to trigger this tool.";
   schema = MySchema;
 
   async execute(params: z.infer<typeof MySchema>): Promise<ToolResult> {
-    // implementation
+    // Your tool's logic here
+    return { success: true, data: "Tool executed successfully!" };
   }
 }
 ```
 
-Then add to `new ToolRegistry([..., new MyTool()])` in `AgentService`.
+Once created, add your new tool to the `ToolRegistry` inside your `AgentService` initialization.
 
----
+## 📄 License
 
-**License:** MIT
+This project is licensed under the MIT License.
+
+```text
+MIT License
+
+Copyright (c) 2024 [Your Name/Organization]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
