@@ -474,6 +474,7 @@ const FileMentionDropdown: React.FC<FileMentionDropdownProps> = ({
 // Main PromptInputBox Component
 interface PromptInputBoxProps {
   onSend?: (message: string, files?: File[]) => void;
+  onStop?: () => void;
   isLoading?: boolean;
   placeholder?: string;
   className?: string;
@@ -486,6 +487,7 @@ interface PromptInputBoxProps {
 export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref: React.Ref<HTMLDivElement>) => {
   const {
     onSend = () => {},
+    onStop = () => {},
     isLoading = false,
     placeholder = "Type your message here... Use @ to mention files or folders",
     className,
@@ -1031,17 +1033,23 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                 size="icon"
                 className={cn(
                   "h-8 w-8 rounded-full transition-all duration-200",
-                  hasContent
+                  isLoading
+                    ? "!bg-[#B91C1C] hover:!bg-[#991B1B] !text-white"
+                    : hasContent
                     ? "bg-white hover:bg-white/80 text-[#1F2023]"
                     : "bg-transparent hover:bg-gray-600/30 text-[#9CA3AF] hover:text-[#D1D5DB]"
                 )}
                 onClick={() => {
-                  if (hasContent) handleSubmit();
+                  if (isLoading) {
+                    onStop();
+                  } else if (hasContent) {
+                    handleSubmit();
+                  }
                 }}
-                disabled={isLoading || !hasContent}
+                disabled={false}
               >
                 {isLoading ? (
-                  <Square className="h-4 w-4 fill-[#1F2023] animate-pulse" />
+                  <Square className="h-3.5 w-3.5 fill-white text-white" />
                 ) : (
                   <ArrowUp className="h-4 w-4 text-[#1F2023]" />
                 )}

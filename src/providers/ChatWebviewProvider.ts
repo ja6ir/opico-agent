@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs/promises";
 import { AgentService } from "../llm/AgentService";
+import { CommandApprovalManager } from "../tools/CommandApprovalManager";
 
 export interface StoredConversation {
   id: string;
@@ -41,6 +42,7 @@ export class ChatWebviewProvider implements vscode.WebviewViewProvider {
 
   private webviewView?: vscode.WebviewView;
   private agentService: AgentService;
+  private commandApproval: CommandApprovalManager;
   private context: vscode.ExtensionContext;
   private currentConversationId: string | null = null;
   private currentEntries: any[] = [];
@@ -57,6 +59,8 @@ export class ChatWebviewProvider implements vscode.WebviewViewProvider {
     this.context = context;
     this.workspaceRoot = workspaceRoot;
     this.agentService = new AgentService(workspaceRoot);
+    this.commandApproval = new CommandApprovalManager();
+    this.agentService.setCommandApproval(this.commandApproval);
   }
 
   resolveWebviewView(
@@ -75,6 +79,8 @@ export class ChatWebviewProvider implements vscode.WebviewViewProvider {
     };
 
     webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
+
+    this.commandApproval.setNotifyWebview((msg) => this.postMessage(msg));
 
     webviewView.webview.onDidReceiveMessage(
       (message) => this.handleWebviewMessage(message),
@@ -163,6 +169,22 @@ export class ChatWebviewProvider implements vscode.WebviewViewProvider {
       }
       case "OPEN_FILE": {
         await this.handleOpenFile(message.payload.path as string);
+        break;
+      }
+      case "STOP_GENERATION": {
+        this.agentService.abort();
+        break;
+      }
+      case "ALLOW_COMMAND": {
+        this.commandApproval.allow(message.payload.toolCallId as string);
+        break;
+      }
+      case "DENY_COMMAND": {
+        this.commandApproval.deny(message.payload.toolCallId as string);
+        break;
+      }
+      case "ABORT_COMMAND": {
+        this.commandApproval.abort(message.payload.toolCallId as string);
         break;
       }
       default:

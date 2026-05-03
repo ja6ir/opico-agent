@@ -10,20 +10,15 @@ import { ReplaceInFileTool } from "../tools/ReplaceInFileTool";
 import { ExecuteCommandTool } from "../tools/ExecuteCommandTool";
 import { SearchWorkspaceTool } from "../tools/SearchWorkspaceTool";
 import { ListDirectoryTool } from "../tools/ListDirectoryTool";
+import type { CommandApprovalManager } from "../tools/CommandApprovalManager";
 
-/**
- * Configuration for which model to use.
- */
 export interface ModelConfig {
-  provider: string; // e.g. "openai", "anthropic", "google", "vertex", "openai-compatible"
+  provider: string;
   model: string;
   apiKey?: string;
   baseURL?: string;
 }
 
-/**
- * Callback types for streaming events back to the Webview.
- */
 export interface AgentCallbacks {
   onEvent: (event: AgentStreamEvent) => void;
   onError: (error: string) => void;
@@ -38,24 +33,16 @@ export type AgentStreamEvent =
   | { type: "step-end" }
   | { type: "done" };
 
-/**
- * AgentService orchestrates the LLM interaction loop.
- *
- * Responsibilities:
- * 1. Initialize the Vercel AI SDK provider (OpenAI or Anthropic).
- * 2. Register all tools via the ToolRegistry.
- * 3. Handle `streamText` calls with tool use, streaming chunks back to the Webview.
- * 4. Maintain conversation history as CoreMessage[].
- */
 export class AgentService {
   private registry: ToolRegistry;
   private conversationHistory: ModelMessage[] = [];
   private modelConfig: ModelConfig;
+  private abortController: AbortController | null = null;
+  private commandApproval?: CommandApprovalManager;
 
   constructor(workspaceRoot: string) {
     const config = vscode.workspace.getConfiguration("opico-agent");
-    
-    // Default model — can be changed via settings
+
     this.modelConfig = {
       provider: config.get<string>("modelProvider") || "anthropic",
       model: config.get<string>("modelName") || "claude-3-5-sonnet-20241022",
@@ -63,7 +50,6 @@ export class AgentService {
       baseURL: config.get<string>("apiBaseUrl") || undefined,
     };
 
-    // Register all tools
     this.registry = new ToolRegistry([
       new ReadFileTool(),
       new ReplaceInFileTool(),
@@ -78,9 +64,20 @@ export class AgentService {
     );
   }
 
-  /**
-   * Custom fetch interceptor to log all requests going to the LLM.
-   */
+  setCommandApproval(manager: CommandApprovalManager): void {
+    this.commandApproval = manager;
+  }
+
+  abort(): void {
+    if (this.abortController) {
+      this.abortController.abort();
+      this.abortController = null;
+    }
+    if (this.commandApproval) {
+      this.commandApproval.abortAll();
+    }
+  }
+
   private customFetch = async (url: string | URL | Request, init?: RequestInit): Promise<Response> => {
     console.log(`\n========== [LLM API Request] ==========`);
     console.log(`${init?.method || 'GET'} ${url}`);
@@ -88,7 +85,6 @@ export class AgentService {
       try {
         const bodyStr = typeof init.body === 'string' ? init.body : init.body.toString();
         const bodyObj = JSON.parse(bodyStr);
-        // Log the exact JSON payload being sent to the provider
         console.log(JSON.stringify(bodyObj, null, 2));
       } catch (e) {
         console.log(init.body);
@@ -98,9 +94,6 @@ export class AgentService {
     return fetch(url, init);
   };
 
-  /**
-   * Create the appropriate Vercel AI SDK model instance based on config.
-   */
   private getModel() {
     switch (this.modelConfig.provider) {
       case "openai": {
@@ -131,15 +124,12 @@ export class AgentService {
         return provider(this.modelConfig.model);
       }
       case "vertex": {
-        // Vertex typically uses default credentials if not passed explicitly, but we allow configuration
         const project = process.env.GOOGLE_VERTEX_PROJECT;
         const location = process.env.GOOGLE_VERTEX_LOCATION;
-        // Vertex doesn't natively expose the fetch override as easily in older versions, but let's try
         const provider = createVertex({ project, location });
         return provider(this.modelConfig.model);
       }
       case "openai-compatible": {
-        // Fallback or generic provider that acts like OpenAI
         const apiKey = this.modelConfig.apiKey || "sk-dummy";
         const baseURL = this.modelConfig.baseURL;
         const provider = createOpenAI({ apiKey, baseURL, fetch: this.customFetch });
@@ -150,9 +140,6 @@ export class AgentService {
     }
   }
 
-  /**
-   * Update the active model configuration.
-   */
   updateConfig(config: Partial<ModelConfig>): void {
     this.modelConfig = { ...this.modelConfig, ...config };
     console.log(`[AgentService] Config updated: ${JSON.stringify(this.modelConfig)}`);
@@ -172,10 +159,6 @@ export class AgentService {
     console.log("[AgentService] Conversation history cleared.");
   }
 
-  /**
-   * Send a prompt to the LLM and stream the response.
-   * Handles the full agentic loop: streaming text, tool calls, and results.
-   */
   async sendMessage(
     userMessage: string,
     callbacks: AgentCallbacks
@@ -187,20 +170,25 @@ export class AgentService {
       content: userMessage,
     });
 
+    let streamResult: Awaited<ReturnType<typeof streamText>> | null = null;
+
     try {
       const model = this.getModel();
 
-      const result = streamText({
+      this.abortController = new AbortController();
+
+      streamResult = streamText({
         model,
         system: systemPrompt,
         messages: this.conversationHistory,
-        tools: this.registry.getTools(),
+        tools: this.registry.getTools(this.commandApproval),
         stopWhen: stepCountIs(25),
+        abortSignal: this.abortController.signal,
       });
 
       callbacks.onEvent({ type: "step-start" });
 
-      for await (const part of result.fullStream) {
+      for await (const part of streamResult.fullStream) {
         switch (part.type) {
           case "text-delta":
             callbacks.onEvent({ type: "text-delta", text: part.text });
@@ -239,21 +227,34 @@ export class AgentService {
         }
       }
 
-      const response = await result.response;
+      const response = await streamResult!.response;
       if (response?.messages) {
         this.conversationHistory.push(...response.messages);
       }
 
+      this.abortController = null;
       callbacks.onEvent({ type: "done" });
     } catch (err: unknown) {
+      this.abortController = null;
+
+      if ((err as any)?.name === "AbortError") {
+        try {
+          const response = await streamResult?.response;
+          if (response?.messages) {
+            this.conversationHistory.push(...response.messages);
+          }
+        } catch {
+          // partial response unavailable
+        }
+        callbacks.onEvent({ type: "done" });
+        return;
+      }
+
       const message = err instanceof Error ? err.message : String(err);
       callbacks.onError(message);
     }
   }
 
-  /**
-   * Build the system prompt that defines the agent's behavior.
-   */
   private buildSystemPrompt(): string {
     return `You are Opico Agent, an expert autonomous AI coding assistant embedded in VS Code.
 

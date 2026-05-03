@@ -32,7 +32,9 @@ export type IncomingMessage =
   | { type: "CONVERSATIONS_LIST"; payload: ConversationSummary[] }
   | { type: "CONVERSATION_LOADED"; payload: { id: string; entries: ChatEntry[] } }
   | { type: "CONVERSATION_BRANCHED"; payload: { id: string; entries: ChatEntry[]; branchPrompt: string } }
-  | { type: "WORKSPACE_FILES"; payload: WorkspaceFileEntry[] };
+  | { type: "WORKSPACE_FILES"; payload: WorkspaceFileEntry[] }
+  | { type: "COMMAND_PENDING"; payload: { toolCallId: string; command: string } }
+  | { type: "COMMAND_EXECUTING"; payload: { toolCallId: string } };
 
 export type OutgoingMessage =
   | { type: "SEND_PROMPT"; payload: string }
@@ -44,7 +46,11 @@ export type OutgoingMessage =
   | { type: "DELETE_CONVERSATION"; payload: { id: string } }
   | { type: "SAVE_CONVERSATION"; payload: { entries: ChatEntry[] } }
   | { type: "LIST_WORKSPACE_FILES"; payload: { query: string } }
-  | { type: "OPEN_FILE"; payload: { path: string } };
+  | { type: "OPEN_FILE"; payload: { path: string } }
+  | { type: "STOP_GENERATION" }
+  | { type: "ALLOW_COMMAND"; payload: { toolCallId: string } }
+  | { type: "DENY_COMMAND"; payload: { toolCallId: string } }
+  | { type: "ABORT_COMMAND"; payload: { toolCallId: string } };
 
 export interface UserMessage {
   id: string;
@@ -83,6 +89,8 @@ function getVsCodeApi(): VsCodeApi {
   return vscodeApi;
 }
 
+export type CommandState = "pending" | "executing";
+
 export function useExtensionBridge() {
   const [entries, setEntries] = useState<ChatEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -96,6 +104,7 @@ export function useExtensionBridge() {
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [branchPrompt, setBranchPrompt] = useState<string | null>(null);
   const [workspaceFiles, setWorkspaceFiles] = useState<WorkspaceFileEntry[]>([]);
+  const [commandStates, setCommandStates] = useState<Record<string, CommandState>>({});
 
   const entriesRef = useRef<ChatEntry[]>(entries);
   entriesRef.current = entries;
@@ -123,6 +132,7 @@ export function useExtensionBridge() {
           const evt = message.payload;
           if (evt.type === "done") {
             setIsLoading(false);
+            setCommandStates({});
             setEntries((prev) => {
               const updated = [...prev];
               const last = updated[updated.length - 1];
@@ -149,12 +159,20 @@ export function useExtensionBridge() {
               }
               return updated;
             });
+            if (evt.type === "tool-result") {
+              setCommandStates((prev) => {
+                const next = { ...prev };
+                delete next[evt.toolCallId];
+                return next;
+              });
+            }
           }
           break;
         }
 
         case "STREAM_ERROR": {
           setIsLoading(false);
+          setCommandStates({});
           setError(message.payload);
           setEntries((prev) => {
             const updated = [...prev];
@@ -178,6 +196,7 @@ export function useExtensionBridge() {
           setEntries([]);
           setError(null);
           setCurrentConversationId(null);
+          setCommandStates({});
           break;
         }
 
@@ -210,6 +229,7 @@ export function useExtensionBridge() {
           setCurrentConversationId(message.payload.id);
           setError(null);
           setIsLoading(false);
+          setCommandStates({});
           break;
         }
 
@@ -219,11 +239,28 @@ export function useExtensionBridge() {
           setBranchPrompt(message.payload.branchPrompt || null);
           setError(null);
           setIsLoading(false);
+          setCommandStates({});
           break;
         }
 
         case "WORKSPACE_FILES": {
           setWorkspaceFiles(message.payload);
+          break;
+        }
+
+        case "COMMAND_PENDING": {
+          setCommandStates((prev) => ({
+            ...prev,
+            [message.payload.toolCallId]: "pending",
+          }));
+          break;
+        }
+
+        case "COMMAND_EXECUTING": {
+          setCommandStates((prev) => ({
+            ...prev,
+            [message.payload.toolCallId]: "executing",
+          }));
           break;
         }
       }
@@ -281,6 +318,27 @@ export function useExtensionBridge() {
     getVsCodeApi().postMessage({ type: "OPEN_FILE", payload: { path: filePath } });
   }, []);
 
+  const stopGeneration = useCallback(() => {
+    getVsCodeApi().postMessage({ type: "STOP_GENERATION" });
+  }, []);
+
+  const allowCommand = useCallback((toolCallId: string) => {
+    getVsCodeApi().postMessage({ type: "ALLOW_COMMAND", payload: { toolCallId } });
+  }, []);
+
+  const denyCommand = useCallback((toolCallId: string) => {
+    getVsCodeApi().postMessage({ type: "DENY_COMMAND", payload: { toolCallId } });
+    setCommandStates((prev) => {
+      const next = { ...prev };
+      delete next[toolCallId];
+      return next;
+    });
+  }, []);
+
+  const abortCommand = useCallback((toolCallId: string) => {
+    getVsCodeApi().postMessage({ type: "ABORT_COMMAND", payload: { toolCallId } });
+  }, []);
+
   return {
     entries,
     isLoading,
@@ -294,6 +352,7 @@ export function useExtensionBridge() {
     currentConversationId,
     branchPrompt,
     workspaceFiles,
+    commandStates,
     clearBranchPrompt: () => setBranchPrompt(null),
     sendPrompt,
     updateConfig,
@@ -304,5 +363,9 @@ export function useExtensionBridge() {
     deleteConversation,
     requestWorkspaceFiles,
     openFile,
+    stopGeneration,
+    allowCommand,
+    denyCommand,
+    abortCommand,
   };
 }

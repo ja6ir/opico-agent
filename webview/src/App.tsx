@@ -3,6 +3,7 @@ import { useExtensionBridge } from "./hooks/useExtensionBridge";
 import { ChatMessage } from "./components/ChatMessage";
 import { SettingsModal } from "./components/SettingsModal";
 import { HistoryPanel } from "./components/HistoryPanel";
+import { CommandApprovalContext } from "./contexts/CommandApprovalContext";
 import { Settings, Trash2, History } from "lucide-react";
 import { PromptInputBox } from "./components/ui/ai-prompt-box";
 
@@ -19,6 +20,7 @@ export default function App() {
     conversations,
     currentConversationId,
     branchPrompt,
+    commandStates,
     clearBranchPrompt,
     sendPrompt,
     updateConfig,
@@ -30,6 +32,10 @@ export default function App() {
     workspaceFiles,
     requestWorkspaceFiles,
     openFile,
+    stopGeneration,
+    allowCommand,
+    denyCommand,
+    abortCommand,
   } = useExtensionBridge();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -66,10 +72,11 @@ export default function App() {
   const isInitialScreen = entries.length === 0;
 
   return (
+    <CommandApprovalContext.Provider value={{ commandStates, allowCommand, denyCommand, abortCommand }}>
     <div
       className={`flex flex-col h-screen font-sans transition-colors duration-500 ${
         isInitialScreen
-          ? "bg-[radial-gradient(125%_125%_at_50%_101%,rgba(245,87,2,1)_10.5%,rgba(245,120,2,1)_16%,rgba(245,140,2,1)_17.5%,rgba(245,170,100,1)_25%,rgba(238,174,202,1)_40%,rgba(202,179,214,1)_65%,rgba(148,201,233,1)_100%)]"
+          ? "bg-[radial-gradient(300%_70%_at_50%_101%,rgba(245,87,2,1)_0%,rgba(245,120,2,1)_8%,rgba(245,140,2,1)_12%,rgba(245,170,100,1)_20%,rgba(238,174,202,1)_38%,rgba(202,179,214,1)_60%,rgba(148,201,233,1)_100%)]"
           : "bg-[#111111] text-gray-200"
       }`}
     >
@@ -130,6 +137,7 @@ export default function App() {
             <div className="w-full max-w-[600px]">
               <PromptInputBox
                 onSend={handleSend}
+                onStop={stopGeneration}
                 isLoading={isLoading}
                 placeholder="Ask me to build, refactor, or explain... Use @ to mention files or folders"
                 value={inputValue}
@@ -166,6 +174,7 @@ export default function App() {
             <div className="max-w-3xl mx-auto">
               <PromptInputBox
                 onSend={handleSend}
+                onStop={stopGeneration}
                 isLoading={isLoading}
                 placeholder="Reply to Opico Agent... Use @ to mention files or folders"
                 value={inputValue}
@@ -198,5 +207,6 @@ export default function App() {
         onDelete={deleteConversation}
       />
     </div>
+    </CommandApprovalContext.Provider>
   );
 }

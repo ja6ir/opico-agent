@@ -263,6 +263,7 @@ const SegmentRenderer: React.FC<{
                   : JSON.stringify(segment.result, null, 2)
                 : undefined,
               _phase: segment.phase,
+              toolCallId: segment.toolCallId,
             }}
           />
         </div>

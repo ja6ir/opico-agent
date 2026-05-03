@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useContext } from "react";
 import {
   FileEdit,
   Terminal,
@@ -10,7 +10,12 @@ import {
   Loader2,
   CheckCircle2,
   AlertCircle,
+  ShieldCheck,
+  ShieldX,
+  OctagonX,
 } from "lucide-react";
+import { CommandApprovalContext } from "../contexts/CommandApprovalContext";
+import type { CommandState } from "../hooks/useExtensionBridge";
 
 interface ToolCallPayload {
   tool: string;
@@ -21,6 +26,7 @@ interface ToolCallPayload {
   added?: number;
   removed?: number;
   _phase?: "calling" | "done" | "error";
+  toolCallId?: string;
   [key: string]: unknown;
 }
 
@@ -221,6 +227,7 @@ const DiffPreview: React.FC<{ searchBlock: string; replaceBlock: string }> = ({
 
 export const ToolBadge: React.FC<ToolBadgeProps> = ({ toolCall }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { commandStates, allowCommand, denyCommand, abortCommand } = useContext(CommandApprovalContext);
   const config = TOOL_CONFIG[toolCall.tool] ?? {
     icon: Terminal,
     label: toolCall.tool,
@@ -229,6 +236,8 @@ export const ToolBadge: React.FC<ToolBadgeProps> = ({ toolCall }) => {
   const Icon = config.icon;
   const phase = toolCall._phase ?? "done";
   const args = getArgs(toolCall);
+  const toolCallId = toolCall.toolCallId ?? "";
+  const commandState: CommandState | undefined = toolCall.tool === "execute_command" ? commandStates[toolCallId] : undefined;
 
   const statusIcon =
     phase === "calling" ? (
@@ -290,6 +299,36 @@ export const ToolBadge: React.FC<ToolBadgeProps> = ({ toolCall }) => {
             </>
           )}
           {statusIcon}
+          {commandState === "pending" && (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={(e) => { e.stopPropagation(); allowCommand(toolCallId); }}
+                className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-colors border border-emerald-500/30"
+                title="Allow command"
+              >
+                <ShieldCheck size={11} />
+                Allow
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); denyCommand(toolCallId); }}
+                className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors border border-red-500/30"
+                title="Deny command"
+              >
+                <ShieldX size={11} />
+                Deny
+              </button>
+            </div>
+          )}
+          {commandState === "executing" && (
+            <button
+              onClick={(e) => { e.stopPropagation(); abortCommand(toolCallId); }}
+              className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors border border-red-500/30"
+              title="Abort command"
+            >
+              <OctagonX size={11} />
+              Abort
+            </button>
+          )}
         </div>
       </button>
 
