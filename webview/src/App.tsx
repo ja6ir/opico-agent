@@ -4,7 +4,7 @@ import { ChatMessage } from "./components/ChatMessage";
 import { SettingsModal } from "./components/SettingsModal";
 import { HistoryPanel } from "./components/HistoryPanel";
 import { CommandApprovalContext } from "./contexts/CommandApprovalContext";
-import { Settings, Trash2, History } from "lucide-react";
+import { Settings, History, Plus } from "lucide-react";
 import { PromptInputBox } from "./components/ui/ai-prompt-box";
 
 export default function App() {
@@ -85,13 +85,47 @@ export default function App() {
           isInitialScreen ? "bg-transparent" : "border-b border-white/5 bg-[#181818]"
         }`}
       >
+        <h1 className={`flex items-center text-xs font-semibold tracking-wide ${isInitialScreen ? "text-white" : ""}`}>
+          <svg width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0 mr-px text-white">
+            <defs>
+              <mask id="ring-mask">
+                <rect width="24" height="24" fill="white"/>
+                <rect x="20.2" y="10.2" width="4" height="3.6" fill="black"/>
+              </mask>
+            </defs>
+            <circle cx="12" cy="12" r="10.2" fill="none" stroke="white" strokeWidth="2.4" strokeLinecap="round" mask="url(#ring-mask)"/>
+            <circle cx="22.2" cy="12" r="1" fill="white" opacity="0.5"/>
+            <rect x="8" y="8" width="8" height="8" rx="1.2" fill="none" stroke="white" strokeWidth="1.4"/>
+            <rect x="9.5" y="9.5" width="5" height="5" rx="0.6" fill="none" stroke="white" strokeWidth="0.9" opacity="0.55"/>
+            <line x1="5.5" y1="12" x2="8" y2="12" stroke="white" strokeWidth="1.2" opacity="0.65"/>
+            <line x1="16" y1="12" x2="17.8" y2="12" stroke="white" strokeWidth="1.2" opacity="0.65"/>
+            <line x1="12" y1="5.5" x2="12" y2="8" stroke="white" strokeWidth="1.2" opacity="0.65"/>
+            <line x1="12" y1="16" x2="12" y2="18.5" stroke="white" strokeWidth="1.2" opacity="0.65"/>
+            <rect x="7" y="9.6" width="1.2" height="0.7" rx="0.15" fill="white" opacity="0.65"/>
+            <rect x="7" y="11.65" width="1.2" height="0.7" rx="0.15" fill="white" opacity="0.65"/>
+            <rect x="7" y="13.7" width="1.2" height="0.7" rx="0.15" fill="white" opacity="0.65"/>
+            <rect x="15.8" y="9.6" width="1.2" height="0.7" rx="0.15" fill="white" opacity="0.65"/>
+            <rect x="15.8" y="11.65" width="1.2" height="0.7" rx="0.15" fill="white" opacity="0.65"/>
+            <rect x="15.8" y="13.7" width="1.2" height="0.7" rx="0.15" fill="white" opacity="0.65"/>
+            <rect x="9.6" y="7" width="0.7" height="1.2" rx="0.15" fill="white" opacity="0.65"/>
+            <rect x="11.65" y="7" width="0.7" height="1.2" rx="0.15" fill="white" opacity="0.65"/>
+            <rect x="13.7" y="7" width="0.7" height="1.2" rx="0.15" fill="white" opacity="0.65"/>
+            <rect x="9.6" y="15.8" width="0.7" height="1.2" rx="0.15" fill="white" opacity="0.65"/>
+            <rect x="11.65" y="15.8" width="0.7" height="1.2" rx="0.15" fill="white" opacity="0.65"/>
+            <rect x="13.7" y="15.8" width="0.7" height="1.2" rx="0.15" fill="white" opacity="0.65"/>
+          </svg>
+          pico Agent
+        </h1>
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <h1 className={`text-sm font-semibold tracking-wide ${isInitialScreen ? "text-white" : ""}`}>
-            Opico Agent
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
+          {!isInitialScreen && (
+            <button
+              onClick={resetConversation}
+              className="p-1.5 rounded transition-colors text-gray-500 hover:text-white hover:bg-white/5"
+              title="New Chat"
+            >
+              <Plus size={16} />
+            </button>
+          )}
           <button
             onClick={handleOpenHistory}
             className={`p-1.5 rounded transition-colors ${
@@ -102,17 +136,6 @@ export default function App() {
             title="Chat History"
           >
             <History size={16} />
-          </button>
-          <button
-            onClick={resetConversation}
-            className={`p-1.5 rounded transition-colors ${
-              isInitialScreen
-                ? "text-white/80 hover:text-white hover:bg-white/20"
-                : "text-gray-500 hover:text-red-400 hover:bg-white/5"
-            }`}
-            title="Reset Conversation"
-          >
-            <Trash2 size={16} />
           </button>
           <button
             onClick={() => setIsSettingsOpen(true)}
@@ -139,7 +162,7 @@ export default function App() {
                 onSend={handleSend}
                 onStop={stopGeneration}
                 isLoading={isLoading}
-                placeholder="Ask me to build, refactor, or explain... Use @ to mention files or folders"
+                placeholder={"Ask me to build, refactor, or explain....\nUse @ to mention files or folders"}
                 value={inputValue}
                 onValueChange={setInputValue}
                 workspaceFiles={workspaceFiles}

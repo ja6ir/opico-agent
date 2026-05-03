@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { ChatEntry, AssistantTurn, AgentStreamEvent } from "../hooks/useExtensionBridge";
 import { ToolBadge } from "./ToolBadge";
-import { Sparkles, GitBranch, Copy, Check } from "lucide-react";
+import { GitBranch, Copy, Check } from "lucide-react";
 
 interface ChatMessageProps {
   entry: ChatEntry;
@@ -72,8 +72,37 @@ const AssistantTurnView: React.FC<{ turn: AssistantTurn; openFile?: (path: strin
   return (
     <div className="group relative flex flex-col items-start pb-4 w-full">
       <div className="flex items-center gap-2 mb-2 px-1 opacity-70">
-        <Sparkles size={14} className="text-[#9b87f5]" />
-        <span className="text-[11px] font-medium text-gray-400">Opico</span>
+        <span className="flex items-center text-[11px] font-medium text-gray-400">
+          <svg width="14" height="14" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0 mr-px text-gray-400">
+            <defs>
+              <mask id="ring-mask-chat">
+                <rect width="24" height="24" fill="white"/>
+                <rect x="20.2" y="10.2" width="4" height="3.6" fill="black"/>
+              </mask>
+            </defs>
+            <circle cx="12" cy="12" r="10.2" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" mask="url(#ring-mask-chat)"/>
+            <circle cx="22.2" cy="12" r="1" fill="currentColor" opacity="0.5"/>
+            <rect x="8" y="8" width="8" height="8" rx="1.2" fill="none" stroke="currentColor" strokeWidth="1.4"/>
+            <rect x="9.5" y="9.5" width="5" height="5" rx="0.6" fill="none" stroke="currentColor" strokeWidth="0.9" opacity="0.55"/>
+            <line x1="5.5" y1="12" x2="8" y2="12" stroke="currentColor" strokeWidth="1.2" opacity="0.65"/>
+            <line x1="16" y1="12" x2="17.8" y2="12" stroke="currentColor" strokeWidth="1.2" opacity="0.65"/>
+            <line x1="12" y1="5.5" x2="12" y2="8" stroke="currentColor" strokeWidth="1.2" opacity="0.65"/>
+            <line x1="12" y1="16" x2="12" y2="18.5" stroke="currentColor" strokeWidth="1.2" opacity="0.65"/>
+            <rect x="7" y="9.6" width="1.2" height="0.7" rx="0.15" fill="currentColor" opacity="0.65"/>
+            <rect x="7" y="11.65" width="1.2" height="0.7" rx="0.15" fill="currentColor" opacity="0.65"/>
+            <rect x="7" y="13.7" width="1.2" height="0.7" rx="0.15" fill="currentColor" opacity="0.65"/>
+            <rect x="15.8" y="9.6" width="1.2" height="0.7" rx="0.15" fill="currentColor" opacity="0.65"/>
+            <rect x="15.8" y="11.65" width="1.2" height="0.7" rx="0.15" fill="currentColor" opacity="0.65"/>
+            <rect x="15.8" y="13.7" width="1.2" height="0.7" rx="0.15" fill="currentColor" opacity="0.65"/>
+            <rect x="9.6" y="7" width="0.7" height="1.2" rx="0.15" fill="currentColor" opacity="0.65"/>
+            <rect x="11.65" y="7" width="0.7" height="1.2" rx="0.15" fill="currentColor" opacity="0.65"/>
+            <rect x="13.7" y="7" width="0.7" height="1.2" rx="0.15" fill="currentColor" opacity="0.65"/>
+            <rect x="9.6" y="15.8" width="0.7" height="1.2" rx="0.15" fill="currentColor" opacity="0.65"/>
+            <rect x="11.65" y="15.8" width="0.7" height="1.2" rx="0.15" fill="currentColor" opacity="0.65"/>
+            <rect x="13.7" y="15.8" width="0.7" height="1.2" rx="0.15" fill="currentColor" opacity="0.65"/>
+          </svg>
+          pico
+        </span>
       </div>
 
       <div className="w-full flex flex-col gap-1">
