@@ -20,247 +20,138 @@
 
 ## Overview
 
-**Opico Agent** is a fully autonomous AI coding assistant that lives inside the VS Code sidebar as a native webview panel. It features a custom-built streaming agent loop, a type-safe tool system with runtime validation, a command approval gate for safe execution, persistent conversation history with branching, file mention autocomplete, and a polished React UI with real-time diff previews.
+**Opico Agent** is a fully autonomous AI coding assistant that lives inside your VS Code sidebar. 
 
-The project spans two distinct build targets — a **Node.js extension host** (esbuild-bundled TypeScript) and a **React webview frontend** (Vite + Tailwind v4) — communicating over a typed bidirectional message bridge.
+Powered by the Vercel AI SDK, it utilizes a custom-built streaming agent loop to iteratively explore your codebase, execute commands, and refactor files. Whether you prefer Anthropic, OpenAI, Google Gemini, or a local open-source model, Opico Agent adapts to your workflow with a polished React UI, real-time diff previews, and a safe command execution gate.
 
-## Architecture
+## ✨ Features
 
-```
+*   **Autonomous Multi-Step Execution:** Give the agent an objective, and it will iterate up to 25 times per session—chaining tools, reading context, and verifying results autonomously.
+*   **Provider Agnostic:** Out-of-the-box support for the leading AI providers plus 50+ pre-configured models. Easily plug in any OpenAI-compatible endpoint for local offline inference (e.g., Ollama, LM Studio).
+*   **File Mention Autocomplete (`@`):** Instantly pull files or folders into the LLM context using `@` in the prompt box, backed by a fuzzy scoring engine and smart `.gitignore` filtering.
+*   **Persistent Branching History:** All conversations are saved natively to VS Code. You can branch a conversation from any previous message to explore a different architectural path without losing context.
+*   **Live Action & Reasoning:** Watch the agent think and act in real-time. Reasoning traces are tucked into collapsible blocks, and tool executions merge seamlessly into the chat stream.
+
+### Built-in Workspace Tools
+
+Opico Agent comes equipped with a core set of file-system tools allowing it to act as an independent developer:
+
+| Tool | Capability | Safety & UX |
+|------|-------------|-------------|
+| `read_file` | Reads files with optional line-range pagination | Line-numbered output with header showing range context |
+| `replace_in_file` | Search/Replace file editing | Validates uniqueness of search block, previews diff stats |
+| `execute_command` | Shell command execution | **Requires User Approval**, output truncation for safety |
+| `search_workspace` | Full-text regex search | Bundles `@vscode/ripgrep` for lightning-fast matching |
+| `list_directory` | Directory tree listing | Recursive with configurable max depth |
+
+## ⚙️ Configuration
+
+Set up your preferred provider, model, and API keys via the extension's Settings modal (the gear icon) or through your VS Code `settings.json`:
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `opico-agent.modelProvider` | AI provider (`anthropic`, `openai`, `google`, `vertex`, `openai-compatible`) | `anthropic` |
+| `opico-agent.modelName` | Model identifier (e.g., `claude-3.5-sonnet`, `gpt-4o`) | `claude-3-5-sonnet-20241022` |
+| `opico-agent.apiKey` | Provider API key (securely falls back to env vars) | — |
+| `opico-agent.apiBaseUrl` | Custom endpoint URL for OpenAI-compatible providers | — |
+
+---
+
+## 🛠️ Under the Hood (Architecture & Engineering)
+
+Opico Agent spans two distinct build targets communicating over a typed bidirectional message bridge: a **Node.js extension host** (esbuild-bundled TypeScript) and a **React webview frontend** (Vite + Tailwind v4).
+
+### System Architecture
+
+```text
 ┌─────────────────────────────────────────────────────────────┐
-│                     VS Code Extension Host                   │
-│                                                              │
-│  extension.ts ──► ChatWebviewProvider ◄──► AgentService      │
-│                       │                          │           │
-│                       │                   ┌──────┴──────┐    │
-│                       │                   │ ToolRegistry │    │
-│                       │                   │  ┌─────────┐ │    │
-│                       │                   │  │BaseTool  │ │    │
-│                       │                   │  │(generic) │ │    │
-│                       │                   │  └────┬────┘ │    │
-│                       │                   │  ┌────┴────┐ │    │
-│                       │                   │  │5 Tools  │ │    │
-│                       │                   │  └─────────┘ │    │
-│                       │                   └─────────────┘    │
-│                       │                          │           │
-│              CommandApprovalManager               │           │
-│              (pending/allow/deny/abort)            │           │
-│                       │                                      │
-│              VS Code GlobalState                             │
-│              (conversation persistence)                      │
+│                    VS Code Extension Host                   │
+│                                                             │
+│ extension.ts ──► ChatWebviewProvider ◄──► AgentService      │
+│                       │                         │           │
+│                       │                 ┌───────┴───────┐   │
+│                       │                 │ ToolRegistry  │   │
+│                       │                 │  ┌─────────┐  │   │
+│                       │                 │  │BaseTool │  │   │
+│                       │                 │  │(generic)│  │   │
+│                       │                 │  └────┬────┘  │   │
+│                       │                 │  ┌────┴────┐  │   │
+│                       │                 │  │5 Tools  │  │   │
+│                       │                 │  └─────────┘  │   │
+│                       │                 └───────────────┘   │
+│                       │                         │           │
+│             CommandApprovalManager              │           │
+│             (pending/allow/deny/abort)          │           │
+│                       │                                     │
+│             VS Code GlobalState                             │
+│             (conversation persistence)                      │
 └───────────────────────┬─────────────────────────────────────┘
                         │ postMessage bridge (typed)
 ┌───────────────────────┴─────────────────────────────────────┐
-│                    React Webview (Vite)                       │
-│                                                              │
-│  App.tsx ──► useExtensionBridge (state machine hook)         │
-│                │                                             │
-│     ┌──────────┼──────────┬──────────────┐                   │
-│     ▼          ▼          ▼              ▼                   │
-│  ChatMessage  ToolBadge  HistoryPanel  PromptInputBox        │
-│  (markdown +  (collapsible (slide-over     (@ file          │
-│   reasoning)   diff view)  panel w/         mention +        │
-│                            animations)      autocomplete)    │
+│                    React Webview (Vite)                     │
+│                                                             │
+│ App.tsx ──► useExtensionBridge (state machine hook)         │
+│               │                                             │
+│     ┌─────────┼─────────┬──────────────┐                    │
+│     ▼         ▼         ▼              ▼                    │
+│ ChatMessage ToolBadge HistoryPanel PromptInputBox           │
+│ (markdown + (diff     (slide-over  (@ file                  │
+│  reasoning)  preview)  panel)       autocomplete)           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Key Features & Engineering Highlights
+### Engineering Highlights
 
-### Autonomous Multi-Step Agent Loop
+*   **Type-Safe Tool System:** Every tool extends a generic `BaseTool<T>` abstract class where `T` is a **Zod schema**. This provides compile-time type safety (`execute(params: z.infer<T>)`) and runtime validation, seamlessly bridging TypeScript interfaces to LLM function calling.
+*   **Command Approval Lifecycle:** Shell execution features a pending → approved/executing → done state machine. Handled by the `CommandApprovalManager`, users can allow, deny, or abort running processes natively from the React UI.
+*   **Event-Driven Streaming:** The AI stream utilizes the `fullStream` async iteration API. Text deltas, reasoning chunks, and tool-call states are dispatched individually across the `postMessage` bridge for fluid, real-time UI rendering without bubble-wrapping.
 
-The agent iterates up to **25 tool-use steps** per user message using the Vercel AI SDK's `streamText` with `stopWhen: stepCountIs(25)`. Each step can chain tools, read context, and self-correct. The streaming response is consumed via `fullStream` async iteration, with events dispatched individually for real-time UI updates.
-
-- **Graceful abort handling**: On `AbortError`, partial responses are salvaged and appended to conversation history so context isn't lost
-- **System prompt generation**: Dynamically injects workspace path, platform info, and registered tool names at runtime
-
-### Type-Safe Tool System with Runtime Validation
-
-Every tool extends a generic `BaseTool<T>` abstract class where `T` is a **Zod schema**. This provides:
-- **Compile-time type safety**: `execute(params: z.infer<T>)` — the parameter type is auto-inferred from the schema
-- **Runtime validation**: Schemas are passed to the LLM via `zodSchema()` for structured tool calling
-- **Self-documenting**: Each schema field includes `.describe()` annotations visible to the LLM
-
-```typescript
-export abstract class BaseTool<T extends z.ZodTypeAny = z.ZodTypeAny> {
-  abstract readonly name: string;
-  abstract readonly description: string;
-  abstract readonly schema: T;
-  abstract execute(params: z.infer<T>): Promise<ToolResult>;
-}
-```
-
-The `ToolRegistry` maps tool instances to Vercel AI SDK `Tool` objects, with special-case wiring for the command approval flow on `execute_command`.
-
-### 5 Built-in Workspace Tools
-
-| Tool | Description | Engineering Detail |
-|------|-------------|-------------------|
-| `read_file` | Read files with optional line-range pagination | Line-numbered output with header showing range context |
-| `replace_in_file` | Search/Replace file editing (no line numbers) | Validates uniqueness of search block, computes diff stats via `diff` package |
-| `execute_command` | Shell command execution with approval gate | Cross-platform shell detection, output truncation with disk dump for large outputs |
-| `search_workspace` | Full-text regex search via ripgrep | Bundles `@vscode/ripgrep`, configurable include/exclude globs, structured output |
-| `list_directory` | Directory tree listing as JSON | Recursive with configurable max depth, smart ignore filtering |
-
-### Command Approval & Abort System
-
-A dedicated `CommandApprovalManager` implements a **pending → approved/executing → done** lifecycle:
-
-```
-LLM calls execute_command → CommandApprovalManager.requestApproval()
-  → Webview shows Allow/Deny buttons
-    → User approves → process spawns → Abort button appears
-      → User aborts → process.kill()
-    → User denies → Promise resolves false → tool returns denial message
-```
-
-This runs over the webview message bridge with state tracked in a React Context (`CommandApprovalContext`), enabling per-command granularity.
-
-### Persistent Conversation History with Branching
-
-Conversations are serialized as `StoredConversation` objects in VS Code's `globalState` storage, preserving both UI entries and raw `ModelMessage[]` arrays for perfect LLM context restoration.
-
-- **Branch from any point**: Users can branch a conversation from any user message, creating a new conversation that inherits prior context up to that point
-- **Incomplete turn trimming**: Partial tool-call cycles (tool called but no result) are automatically trimmed from restored history to prevent LLM errors
-- **Title auto-derivation**: Conversation titles are derived from the first user message
-
-### File Mention Autocomplete (`@` mentions)
-
-The prompt input supports `@`-triggered file/folder mention with:
-- **Recursive workspace scanning** with configurable depth limits and smart ignore patterns (skips `node_modules`, `.git`, `dist`, etc.)
-- **Fuzzy scoring engine**: Results are ranked by match position, filename exactness, and type preference
-- **5-second cache**: File list is cached with TTL-based invalidation for responsive repeated queries
-
-### Real-Time Streaming UI
-
-The webview renders the agent's streamed response in real-time with three segment types:
-
-1. **Text** — Markdown rendered via `react-markdown` with GFM support, file path links that open in the editor
-2. **Reasoning** — Collapsible `<details>` block with purple accent styling
-3. **Tool calls** — `ToolBadge` components with per-tool icons, inline diff previews for file edits, and command approval buttons
-
-A custom `collateEvents()` function merges consecutive deltas of the same type and matches tool-call events with their corresponding tool-result events for correct phase rendering.
-
-### React Webview Architecture
-
-The frontend uses a **typed bidirectional message bridge** (`useExtensionBridge` hook) with:
-- `IncomingMessage` and `OutgoingMessage` discriminated union types for full type safety
-- `acquireVsCodeApi()` singleton pattern to prevent re-initialization on React re-renders
-- Ref-based state access for async callbacks (`entriesRef`)
-
-### Provider-Agnostic LLM Integration
-
-Supports **5 provider backends** out of the box through the Vercel AI SDK:
-
-| Provider | Package | Notes |
-|----------|---------|-------|
-| Anthropic | `@ai-sdk/anthropic` | Default, `claude-3-5-sonnet` |
-| OpenAI | `@ai-sdk/openai` | `gpt-4o`, etc. |
-| Google Gemini | `@ai-sdk/google` | API key based |
-| Google Vertex | `@ai-sdk/google-vertex` | Service account based |
-| OpenAI-Compatible | `@ai-sdk/openai-compatible` | Ollama, Together, DeepSeek, etc. |
-
-API keys fall back through: VS Code settings → provider-specific settings → environment variables.
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Extension Host | TypeScript, Node.js, VS Code Extension API |
-| Bundler (Extension) | esbuild with custom watch plugin |
-| Bundler (Webview) | Vite |
-| UI Framework | React 19, Tailwind CSS v4 |
-| Animation | Framer Motion |
-| Icons | Lucide React |
-| Markdown | react-markdown + remark-gfm |
-| LLM SDK | Vercel AI SDK v6 |
-| Schema Validation | Zod v4 |
-| Diff Computation | `diff` npm package |
-| Search Engine | `@vscode/ripgrep` |
-
-## Project Structure
-
-```
+### Project Structure
+```text
 opico-agent/
 ├── src/                          # Extension (Node.js) source
 │   ├── extension.ts              # Activation entry point
 │   ├── llm/
 │   │   └── AgentService.ts       # Agent loop, provider factory, streaming
 │   ├── providers/
-│   │   └── ChatWebviewProvider.ts # Webview bridge, conversation persistence, file scanning
+│   │   └── ChatWebviewProvider.ts # Webview bridge, history, file scanning
 │   ├── tools/
 │   │   ├── BaseTool.ts           # Generic abstract base class
 │   │   ├── ToolRegistry.ts       # Tool registration & AI SDK adapter
-│   │   ├── CommandApprovalManager.ts # Approval/abort lifecycle
-│   │   ├── ExecuteCommandTool.ts  # Shell execution with approval
-│   │   ├── ReadFileTool.ts       # File reading with line ranges
-│   │   ├── ReplaceInFileTool.ts  # Search/replace with diff stats
-│   │   ├── SearchWorkspaceTool.ts # Ripgrep-powered search
-│   │   └── ListDirectoryTool.ts  # Recursive directory tree
+│   │   └── CommandApprovalManager.ts
 │   └── utils/
 │       └── diffHelper.ts         # Diff stats & unified diff generation
 ├── webview/                      # React webview frontend
 │   ├── src/
-│   │   ├── App.tsx               # Root component with hero/chat states
-│   │   ├── components/
-│   │   │   ├── ChatMessage.tsx   # Message rendering with reasoning & tool badges
-│   │   │   ├── ToolBadge.tsx     # Collapsible tool call UI with diff preview
-│   │   │   ├── HistoryPanel.tsx  # Slide-over conversation history
-│   │   │   ├── SettingsModal.tsx # Provider/model/API key configuration
-│   │   │   └── ui/
-│   │   │       └── ai-prompt-box.tsx # Prompt input with @ mention autocomplete
-│   │   ├── contexts/
-│   │   │   └── CommandApprovalContext.tsx # Command state context
+│   │   ├── components/           # UI (Chat, Badges, History, Settings)
+│   │   ├── contexts/             # React Contexts (CommandApproval)
 │   │   └── hooks/
 │   │       └── useExtensionBridge.ts # Typed VS Code message bridge
-│   ├── vite.config.ts
-│   └── tailwind.config.ts
+│   └── vite.config.ts
 ├── esbuild.js                    # Extension build config
-├── models.json                   # 50+ pre-configured model definitions
 └── package.json                  # Extension manifest & dependencies
 ```
 
-## Getting Started
+## 🚀 Development & Setup
 
 ### Prerequisites
+*   Node.js 18+
+*   VS Code 1.85+
 
-- Node.js 18+
-- VS Code 1.85+
-
-### Build
-
+### Build & Run
 ```bash
-# Install all dependencies
+# 1. Install dependencies
 npm install
 cd webview && npm install && cd ..
 
-# Production build
-npm run build
-
-# Development (watch both extension and webview)
+# 2. Start the watch compiler (builds extension + webview in parallel)
 npm run dev
 ```
+Open the project in VS Code and press `F5` to launch the Extension Development Host.
 
-### Debug
+### Extending with Custom Tools
 
-1. Open the project in VS Code
-2. Press `F5` to launch the Extension Development Host
-3. The Opico Agent sidebar icon appears in the Activity Bar
-
-### Configuration
-
-Configure via the extension's Settings modal (gear icon) or `settings.json`:
-
-| Setting | Description | Default |
-|---------|-------------|---------|
-| `opico-agent.modelProvider` | AI provider (`anthropic`, `openai`, `google`, `vertex`, `openai-compatible`) | `anthropic` |
-| `opico-agent.modelName` | Model identifier | `claude-3-5-sonnet-20241022` |
-| `opico-agent.apiKey` | Provider API key (falls back to env vars) | — |
-| `opico-agent.apiBaseUrl` | Custom endpoint URL for OpenAI-compatible providers | — |
-
-## Extending with Custom Tools
-
-The tool system is designed for extensibility. Create a new tool by extending `BaseTool`:
-
+The tool system is built for modularity. Extend `BaseTool` and define a Zod schema to add capabilities:
 ```typescript
 import { z } from "zod";
 import { BaseTool, ToolResult } from "./tools/BaseTool";
@@ -280,28 +171,16 @@ export class MyTool extends BaseTool<typeof MySchema> {
 }
 ```
 
-Register it in `AgentService`:
-
-```typescript
-this.registry = new ToolRegistry([
-  // ...existing tools
-  new MyTool(),
-]);
-```
-
-The agent automatically understands how and when to use it — the schema and description are sent to the LLM as tool definitions.
-
-## Design Decisions
+## 🧠 Design Decisions
 
 | Decision | Rationale |
 |----------|-----------|
-| **Search/Replace over line numbers** for `replace_in_file` | Avoids off-by-one errors and stale references. The LLM provides exact code blocks, and uniqueness is validated before applying. |
+| **Search/Replace over line numbers** for editing | Avoids off-by-one errors and stale references caused by LLM line-number hallucinations. Uniqueness is validated before applying code patches. |
 | **Zod schemas as single source of truth** | One schema definition drives both TypeScript types (compile-time) and LLM parameter definitions (runtime). |
-| **Command approval gate** | Shell commands are inherently destructive. The approval system gives users full control with allow/deny/abort granularity. |
-| **Ripgrep via `@vscode/ripgrep`** | Guarantees availability without requiring system installation, and matches VS Code's own search backend. |
-| **Dual build pipeline** (esbuild + Vite) | esbuild is ideal for the Node.js extension host (CJS output, external `vscode`), while Vite provides HMR and optimized bundling for the React webview. |
-| **Typed message bridge** | Discriminated unions on both `IncomingMessage` and `OutgoingMessage` ensure compile-time safety across the webview boundary. |
+| **Dual build pipeline (esbuild + Vite)** | esbuild handles the Node.js extension host (CJS output, external `vscode` module), while Vite provides HMR and optimized bundling for the React UI. |
+| **Typed message bridge** | Discriminated unions on `IncomingMessage` and `OutgoingMessage` ensure compile-time safety across the otherwise untyped webview boundary. |
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License.
+```</ToolResult>
