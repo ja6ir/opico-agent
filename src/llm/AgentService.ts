@@ -80,18 +80,121 @@ export class AgentService {
 
   private customFetch = async (url: string | URL | Request, init?: RequestInit): Promise<Response> => {
     console.log(`\n========== [LLM API Request] ==========`);
-    console.log(`${init?.method || 'GET'} ${url}`);
+    const urlStr = url instanceof Request ? url.url : String(url);
+    console.log(`${init?.method || 'GET'} ${urlStr}`);
+
+    // Log request headers
+    if (init?.headers) {
+      const headers: Record<string, string> = {};
+      if (init.headers instanceof Headers) {
+        init.headers.forEach((value, key) => {
+          // Mask API keys for security but show last 4 chars
+          if (key.toLowerCase().includes('key') || key.toLowerCase().includes('auth') || key.toLowerCase().includes('authorization')) {
+            headers[key] = `****${value.slice(-4)}`;
+          } else {
+            headers[key] = value;
+          }
+        });
+      } else if (Array.isArray(init.headers)) {
+        for (const [key, value] of init.headers) {
+          if (key.toLowerCase().includes('key') || key.toLowerCase().includes('auth') || key.toLowerCase().includes('authorization')) {
+            headers[key] = `****${String(value).slice(-4)}`;
+          } else {
+            headers[key] = String(value);
+          }
+        }
+      } else if (typeof init.headers === 'object') {
+        for (const [key, value] of Object.entries(init.headers as Record<string, string>)) {
+          if (key.toLowerCase().includes('key') || key.toLowerCase().includes('auth') || key.toLowerCase().includes('authorization')) {
+            headers[key] = `****${String(value).slice(-4)}`;
+          } else {
+            headers[key] = String(value);
+          }
+        }
+      }
+      console.log(`[Request Headers] ${JSON.stringify(headers, null, 2)}`);
+    }
+
     if (init?.body) {
       try {
         const bodyStr = typeof init.body === 'string' ? init.body : init.body.toString();
         const bodyObj = JSON.parse(bodyStr);
-        console.log(JSON.stringify(bodyObj, null, 2));
+        console.log(`[Request Body] ${JSON.stringify(bodyObj, null, 2)}`);
       } catch (e) {
-        console.log(init.body);
+        console.log(`[Request Body] ${init.body}`);
       }
     }
     console.log(`=======================================\n`);
-    return fetch(url, init);
+
+    // Execute the request and log the raw response
+    const response = await fetch(url, init);
+
+    console.log(`\n========== [LLM API Response] ==========`);
+    console.log(`[Response URL] ${urlStr}`);
+    console.log(`[Response Status] ${response.status} ${response.statusText}`);
+    console.log(`[Response Headers]`);
+    response.headers.forEach((value, key) => {
+      console.log(`  ${key}: ${value}`);
+    });
+
+    // Clone the response so we can read the body without consuming it
+    const cloned = response.clone();
+
+    // For non-streaming responses or error responses, log the body
+    if (!response.ok || response.status >= 400) {
+      try {
+        const errorBody = await cloned.text();
+        console.log(`[Response Body] ${errorBody}`);
+      } catch (e) {
+        console.log(`[Response Body] <could not read: ${(e as Error).message}>`);
+      }
+    } else {
+      // For streaming responses, intercept the stream to log chunks
+      const originalBody = response.body;
+      if (originalBody) {
+        const self = this;
+        const loggedStream = new ReadableStream({
+          start(controller) {
+            const reader = originalBody.getReader();
+            let totalChunks = 0;
+
+            function pump(): Promise<void> {
+              return reader.read().then(({ done, value }) => {
+                if (done) {
+                  console.log(`\n[Stream Complete] Total chunks: ${totalChunks}`);
+                  console.log(`=======================================\n`);
+                  controller.close();
+                  return;
+                }
+                totalChunks++;
+                // Log each chunk (limit to first 5 and last 5 to avoid spam)
+                const chunkStr = new TextDecoder().decode(value);
+                if (totalChunks <= 5) {
+                  console.log(`[Stream Chunk #${totalChunks}] ${chunkStr.substring(0, 500)}${chunkStr.length > 500 ? '... (truncated)' : ''}`);
+                } else if (totalChunks === 6) {
+                  console.log(`[Stream] ... suppressing middle chunks ...`);
+                }
+                controller.enqueue(value);
+                return pump();
+              });
+            }
+            return pump();
+          }
+        });
+
+        // Return a new Response with the logged stream, preserving original status/headers
+        const loggedResponse = new Response(loggedStream, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers,
+        });
+
+        return loggedResponse;
+      }
+    }
+
+    console.log(`=======================================\n`);
+    return response;
   };
 
   private getModel() {
@@ -173,6 +276,12 @@ export class AgentService {
     let streamResult: Awaited<ReturnType<typeof streamText>> | null = null;
 
     try {
+      console.log(`\n========== [AgentService Config] ==========`);
+      console.log(`[Provider] ${this.modelConfig.provider}`);
+      console.log(`[Model] ${this.modelConfig.model}`);
+      console.log(`[API Key] ${this.modelConfig.apiKey ? `****${this.modelConfig.apiKey.slice(-4)} (len=${this.modelConfig.apiKey.length})` : '<NOT SET>'}`);
+      console.log(`[Base URL] ${this.modelConfig.baseURL || '<NOT SET>'}`);
+      console.log(`=============================================\n`);
       const model = this.getModel();
 
       this.abortController = new AbortController();

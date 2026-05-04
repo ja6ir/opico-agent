@@ -3,7 +3,7 @@
   "displayName": "Opico Agent",
   "description": "An autonomous AI coding agent for VS Code",
   "version": "0.1.0",
-  "publisher": "opico",
+  "publisher": "ja6ir",
   "engines": {
     "vscode": "^1.85.0"
   },
