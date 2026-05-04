@@ -14,7 +14,9 @@
 
 </div>
 
-![Opico Agent Demo](demo/chat.gif)
+<div align="center">
+<img src="demo/chat.gif" alt="Opico Agent Demo" />
+</div>
 
 ---
 
@@ -182,5 +184,4 @@ export class MyTool extends BaseTool<typeof MySchema> {
 
 ## 📄 License
 
-This project is licensed under the MIT License.
-```</ToolResult>
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
