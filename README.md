@@ -14,6 +14,8 @@
 
 </div>
 
+![Opico Agent Demo](demo/chat.gif)
+
 ---
 
 ## Overview
